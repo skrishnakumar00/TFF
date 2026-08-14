@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Household Financial Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<style>
+  :root{
+    --ink:#1B241E; --ink-soft:#4B564D;
+    --paper:#F3F1E8; --paper-raised:#FBFAF4;
+    --ledger:#16261F;
+    --gold:#B98A3D; --gold-soft:#E4CB9A;
+    --teal:#3E7C6B; --teal-bg:#E4EEE9;
+    --rust:#B5573F; --rust-bg:#F3E4DF;
+    --rule:#C9C4B3; --rule-soft:#DEDACB;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans', sans-serif; font-size:15px; line-height:1.6;}
+  .wrap{max-width:960px; margin:0 auto; padding:0 20px 64px;}
+  .num{font-family:'IBM Plex Mono', monospace; font-variant-numeric:tabular-nums;}
+
+  .masthead{background:var(--ledger); color:#EFEAD9; padding:22px 20px; border-radius:0 0 14px 14px;}
+  .masthead-inner{max-width:960px; margin:0 auto; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.12em; text-transform:uppercase; color:#B9C4B5; margin:0 0 4px;}
+  .household-name{font-family:'Fraunces', serif; font-weight:500; font-size:22px; margin:0; color:#FBFAF4;}
+  .stamp{border:1.5px solid var(--gold-soft); color:var(--gold-soft); font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:5px 10px; border-radius:3px;}
+
+  .section{margin-top:40px;}
+  .section-head{display:flex; align-items:baseline; gap:10px; margin-bottom:16px; border-bottom:1.5px solid var(--ink); padding-bottom:8px;}
+  .section-index{font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--gold); font-weight:500;}
+  .section-title{font-family:'Fraunces', serif; font-size:21px; font-weight:500; margin:0;}
+  .section-note{margin-left:auto; font-size:12px; color:var(--ink-soft);}
+
+  .pill-row{display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;}
+  .pill{font-family:'IBM Plex Mono', monospace; font-size:12.5px; background:none; border:1px solid var(--rule); color:var(--ink-soft); padding:7px 14px; border-radius:20px; cursor:pointer; display:flex; align-items:center; gap:6px;}
+  .pill.active{background:var(--ledger); border-color:var(--ledger); color:#FBFAF4;}
+  .pill .live-dot{width:6px; height:6px; border-radius:50%; background:var(--rust); display:inline-block;}
+  .pill.active .live-dot{background:#E7A38F;}
+  .pill.ghost{background:none; border:1px solid var(--rule); color:var(--ink);}
+  .pill.ghost.active{background:var(--gold); border-color:var(--gold); color:#2B2308;}
+
+  .kpi-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:10px;}
+  @media (max-width:640px){ .kpi-grid{grid-template-columns:1fr;} }
+  .kpi-card{background:var(--paper-raised); border:0.5px solid var(--rule); border-radius:10px; padding:16px 18px;}
+  .kpi-head{font-size:11.5px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; margin:0 0 10px;}
+  .kpi-line{display:flex; justify-content:space-between; font-size:13.5px; padding:4px 0;}
+  .kpi-line .val{font-family:'IBM Plex Mono',monospace;}
+  .kpi-ratio{display:flex; justify-content:space-between; align-items:baseline; margin-top:10px; padding-top:8px; border-top:0.5px dashed var(--rule);}
+  .kpi-ratio-label{font-size:12.5px; font-weight:600;}
+  .kpi-ratio-val{font-size:20px; font-weight:600; font-family:'IBM Plex Mono',monospace;}
+  .kpi-track{height:8px; border-radius:4px; background:var(--rule-soft); overflow:hidden; margin-top:8px;}
+  .kpi-fill{height:100%; border-radius:4px;}
+
+  .note-line{font-size:12px; color:var(--ink-soft); margin:0 0 22px; padding-left:2px;}
+  .note-line i{color:var(--gold); margin-right:5px;}
+
+  .col-label{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px 4px;}
+
+  .ledger-card{background:var(--paper-raised); border:0.5px solid var(--rule); border-radius:10px; padding:6px 20px; position:relative;}
+  .ledger-card::before{content:""; position:absolute; top:0; bottom:0; left:0; width:3px; background:var(--rust); opacity:0.5; border-radius:10px 0 0 10px;}
+  .ledger-row{display:flex; align-items:baseline; gap:8px; padding:10px 0 10px 14px; border-bottom:0.5px solid var(--rule-soft);}
+  .ledger-row .label{white-space:nowrap; font-size:14px;}
+  .ledger-row .tag{font-size:10.5px; font-family:'IBM Plex Mono', monospace; padding:1px 6px; border-radius:3px; margin-left:6px; background:var(--rule-soft); color:var(--ink-soft); white-space:normal;}
+  .ledger-row .tag.pct{font-weight:600; text-transform:uppercase;}
+  .ledger-row .tag.pct.ok{background:var(--teal-bg); color:var(--teal);}
+  .ledger-row .tag.pct.warn{background:rgba(185,138,61,0.18); color:#8A6323;}
+  .ledger-row .tag.pct.over{background:var(--rust-bg); color:var(--rust);}
+  .ledger-row .leader{flex:1; border-bottom:1px dotted #A9A38E; margin:0 4px 4px;}
+  .ledger-row .amount{font-weight:500; white-space:nowrap; font-size:14.5px;}
+  .ledger-row.total{padding-top:12px; margin-top:2px; border-top:2px solid var(--ink); border-bottom:none;}
+  .ledger-row.total .label, .ledger-row.total .amount{font-weight:600; font-size:15.5px;}
+  .ledger-row.expandable{cursor:pointer;}
+  .ledger-row.expandable:hover{background:rgba(0,0,0,0.02);}
+  .expand-icon{font-size:15px; color:var(--ink-soft); transition:transform .15s ease; flex-shrink:0;}
+  .expand-icon.open{transform:rotate(180deg);}
+
+  .cat-sub{font-size:12px; padding:0 0 10px 14px; margin-top:-4px; color:var(--ink-soft);}
+  .cat-sub.over{color:var(--rust);}
+  .cat-sub.ok{color:var(--teal);}
+  .cat-sub.warn{color:#8A6323;}
+
+  .tx-list{padding:0 0 8px 14px; display:none;}
+  .tx-list.open{display:block;}
+  .tx-row{display:flex; justify-content:space-between; font-size:12.5px; color:var(--ink-soft); padding:5px 0 5px 16px; border-bottom:0.5px dotted var(--rule-soft);}
+  .tx-row:last-child{border-bottom:none;}
+  .tx-row .val{font-family:'IBM Plex Mono',monospace;}
+  .tx-empty{font-size:12.5px; color:var(--ink-soft); padding:6px 0 6px 16px; font-style:italic;}
+
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media (max-width:640px){ .two-col{grid-template-columns:1fr;} }
+
+  .nw-line{display:flex; align-items:baseline; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+  .nw-line .nw-num{font-family:'Fraunces',serif; font-weight:500; font-size:26px;}
+  .nw-line .nw-tag{font-size:12px; color:var(--ink-soft);}
+
+  .ins-group{margin-bottom:22px;}
+  .ins-group:last-child{margin-bottom:0;}
+  .ins-group-title{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--teal); margin:0 0 8px 4px; display:flex; align-items:center; gap:6px;}
+  .ins-row{display:grid; grid-template-columns:1.1fr 1fr 1fr 1fr 0.8fr; gap:10px; align-items:baseline; padding:10px 14px; border-bottom:0.5px solid var(--rule-soft); font-size:13px;}
+  .ins-row:last-child{border-bottom:none;}
+  .ins-row .holder{color:var(--ink-soft); font-size:11.5px; display:block;}
+  .ins-row .val{font-family:'IBM Plex Mono', monospace; font-weight:500;}
+  .ins-row .renewal{color:var(--ink-soft); font-size:12px; text-align:right;}
+  @media (max-width:720px){ .ins-row{grid-template-columns:1fr 1fr; row-gap:4px;} .ins-row .renewal{text-align:left;} }
+
+  .state-msg{font-size:13px; color:var(--ink-soft); padding:20px 4px; font-style:italic;}
+  footer{margin-top:48px; text-align:center; font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="masthead-inner">
+    <div>
+      <p class="eyebrow">Household financial ledger</p>
+      <h1 class="household-name" id="householdName">Loading…</h1>
+    </div>
+    <span class="stamp" id="mastheadStamp"></span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- 01 Income & Expense -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-index">01</span>
+      <h2 class="section-title">Income &amp; expense</h2>
+      <span class="section-note">Estimates and actuals, by month</span>
+    </div>
+
+    <div class="pill-row" id="monthPills"></div>
+
+    <div class="kpi-grid" id="kpiGrid"></div>
+    <p class="note-line" id="accrualNote"></p>
+
+    <div class="pill-row" id="viewPills"></div>
+    <p class="col-label" id="breakdownLabel">Estimated</p>
+    <div class="ledger-card" id="breakdownCard"><p class="state-msg">Loading…</p></div>
+  </div>
+
+  <!-- 02 Assets & Liabilities -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-index">02</span>
+      <h2 class="section-title">Assets &amp; liabilities</h2>
+    </div>
+    <div class="nw-line">
+      <span class="nw-num num" id="nwValue">—</span>
+      <span class="nw-tag">net worth</span>
+    </div>
+    <div class="two-col">
+      <div>
+        <p class="col-label">Assets</p>
+        <div class="ledger-card" id="assetsCard"><p class="state-msg">Loading…</p></div>
+      </div>
+      <div>
+        <p class="col-label">Liabilities</p>
+        <div class="ledger-card" id="liabCard"><p class="state-msg">Loading…</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 Insurance -->
+  <div class="section">
+    <div class="section-head">
+      <span class="section-index">03</span>
+      <h2 class="section-title">Insurance</h2>
+      <span class="section-note">Policy register</span>
+    </div>
+    <div id="insuranceGroups"><p class="state-msg">Loading…</p></div>
+  </div>
+
+  <footer>Data from the household Google Sheet, via Apps Script</footer>
+</div>
+
+<script>
+/* ============================================================
+ * CONFIG — paste your deployed Apps Script web app URL below
+ * ============================================================ */
+const APPS_SCRIPT_URL = 'PASTE_YOUR_DEPLOYED_WEB_APP_URL_HERE';
+
+const fmt = n => '₹' + Math.round(n || 0).toLocaleString('en-IN');
+const zoneColor = pct => pct < 70 ? 'ok' : pct < 95 ? 'warn' : 'over';
+const zoneHex = { ok:'#3E7C6B', warn:'#B98A3D', over:'#B5573F' };
+
+async function api(action, params={}) {
+  const qs = new URLSearchParams({ action, ...params }).toString();
+  const res = await fetch(`${APPS_SCRIPT_URL}?${qs}`);
+  if (!res.ok) throw new Error('Request failed: ' + action);
+  return res.json();
+}
+
+/* ============================================================
+ * MONTHS — trailing 3 months from today, computed client-side
+ * ============================================================ */
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function monthKey(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+function monthLabel(key){
+  const [y,m] = key.split('-').map(Number);
+  return `${MONTH_NAMES[m-1]} ${y}`;
+}
+function recentMonths(n=3){
+  const now = new Date();
+  const arr = [];
+  for (let i=n-1; i>=0; i--){
+    arr.push(monthKey(new Date(now.getFullYear(), now.getMonth()-i, 1)));
+  }
+  return arr;
+}
+const months = recentMonths(3);
+const currentMonth = months[months.length-1];
+
+/* ============================================================
+ * STATE
+ * ============================================================ */
+let selectedMonth = currentMonth;
+let selectedView = 'actual';
+const cache = {};
+
+/* ============================================================
+ * MONTH PILLS
+ * ============================================================ */
+function renderMonthPills(){
+  document.getElementById('monthPills').innerHTML = months.map(m => `
+    <button class="pill ${m===selectedMonth?'active':''}" data-month="${m}">
+      ${m===currentMonth?'<span class="live-dot"></span>':''}${monthLabel(m)}${m===currentMonth?' · in progress':''}
+    </button>`).join('');
+  document.querySelectorAll('#monthPills .pill').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      selectedMonth = btn.dataset.month;
+      document.querySelectorAll('#monthPills .pill').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      await loadAndRenderIncomeExpense();
+    });
+  });
+}
+
+/* ============================================================
+ * VIEW PILLS (Estimate / Actual) — fixed: click now updates
+ * its own active state directly instead of relying on a re-render
+ * ============================================================ */
+function renderViewPills(){
+  const views = [{k:'estimated', label:'Estimated'}, {k:'actual', label:'Actual'}];
+  document.getElementById('viewPills').innerHTML = views.map(v => `
+    <button class="pill ghost ${v.k===selectedView?'active':''}" data-view="${v.k}">${v.label}</button>`).join('');
+  document.querySelectorAll('#viewPills .pill').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      selectedView = btn.dataset.view;
+      document.querySelectorAll('#viewPills .pill').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderBreakdown(cache[selectedMonth]);
+    });
+  });
+}
+
+/* ============================================================
+ * KPI CARDS
+ * ============================================================ */
+function renderKpiCards(data){
+  const { estimate, actual } = data;
+  const estIncomeTotal = estimate.income.reduce((s,i)=>s+i.amount,0);
+  const estExpenseTotal = estimate.expense.reduce((s,e)=>s+e.amount,0);
+  const estRatio = estIncomeTotal ? estExpenseTotal/estIncomeTotal*100 : 0;
+
+  const actIncomeTotal = actual.income.reduce((s,i)=>s+i.amount,0);
+  const catList = expenseCategoryList(data);
+  const actExpenseTotal = catList.reduce((s,c)=>s + spentFor(data,c), 0);
+  const actRatio = actIncomeTotal ? actExpenseTotal/actIncomeTotal*100 : 0;
+
+  const card = (title, income, expense, ratio) => `
+    <div class="kpi-card">
+      <p class="kpi-head">${title}</p>
+      <div class="kpi-line"><span>Total income</span><span class="val">${fmt(income)}</span></div>
+      <div class="kpi-line"><span>Total expense</span><span class="val">${fmt(expense)}</span></div>
+      <div class="kpi-ratio">
+        <span class="kpi-ratio-label">Expense % of income</span>
+        <span class="kpi-ratio-val" style="color:${zoneHex[zoneColor(ratio)]}">${ratio.toFixed(1)}%</span>
+      </div>
+      <div class="kpi-track"><div class="kpi-fill" style="width:${Math.min(ratio,100)}%; background:${zoneHex[zoneColor(ratio)]}"></div></div>
+    </div>`;
+
+  document.getElementById('kpiGrid').innerHTML =
+    card('Estimated', estIncomeTotal, estExpenseTotal, estRatio) +
+    card('Actual' + (data.isCurrent ? ' · so far' : ''), actIncomeTotal, actExpenseTotal, actRatio);
+
+  document.getElementById('accrualNote').innerHTML = '';
+  document.getElementById('mastheadStamp').textContent = monthLabel(data.month) + (data.isCurrent ? ' · in progress' : '');
+}
+
+function expenseCategoryList(data){
+  const fromEstimate = data.estimate.expense.map(e=>e.label);
+  const fromActual = Object.keys(data.actual.expense);
+  const seen = new Set();
+  const ordered = [];
+  [...fromEstimate, ...fromActual].forEach(c=>{ if(!seen.has(c)){ seen.add(c); ordered.push(c); } });
+  return ordered;
+}
+function spentFor(data, cat){
+  return (data.actual.expense[cat]||[]).reduce((s,t)=>s+t.amount,0);
+}
+
+/* ============================================================
+ * BREAKDOWN (Estimate or Actual list)
+ * ============================================================ */
+function renderBreakdown(data){
+  if (!data) return;
+  document.getElementById('breakdownLabel').textContent = selectedView === 'estimated' ? 'Estimated' : 'Actual';
+  const card = document.getElementById('breakdownCard');
+  const { estimate, actual, isCurrent, dayOfMonth, daysInMonth, categoryMeta } = data;
+  const elapsedPct = daysInMonth ? dayOfMonth/daysInMonth*100 : 0;
+
+  if (selectedView === 'estimated'){
+    const total = estimate.expense.reduce((s,e)=>s+e.amount,0);
+    card.innerHTML = (estimate.expense.length ? estimate.expense.map(e => `
+      <div class="ledger-row">
+        <span class="label">${e.label}${e.notes ? `<span class="tag">${e.notes}</span>` : ''}</span>
+        <span class="leader"></span>
+        <span class="amount num">${fmt(e.amount)}</span>
+      </div>`).join('') : `<p class="state-msg">No estimate entered for this month yet</p>`) + (estimate.expense.length ? `
+      <div class="ledger-row total"><span class="label">Total expense</span><span class="leader"></span><span class="amount num">${fmt(total)}</span></div>` : '');
+    return;
+  }
+
+  const catList = expenseCategoryList(data);
+  let total = 0;
+  const rows = catList.map(c => {
+    const budgetEntry = estimate.expense.find(e=>e.label===c);
+    const budget = budgetEntry ? budgetEntry.amount : 0;
+    const txs = actual.expense[c] || [];
+    const spent = txs.reduce((s,t)=>s+t.amount,0);
+    total += spent;
+    const pct = budget ? (spent/budget*100) : 0;
+    const zone = zoneColor(pct);
+    const discretionary = categoryMeta[c] ? categoryMeta[c].discretionary : false;
+
+    let subText, subZone;
+    if (isCurrent){
+      if (discretionary){
+        const remaining = budget - spent;
+        const gap = pct - elapsedPct;
+        const pace = gap > 15 ? 'Ahead of pace' : gap < -15 ? 'Under pace' : 'On pace';
+        subZone = remaining < 0 ? 'over' : (gap > 15 ? 'over' : gap < -15 ? 'ok' : 'warn');
+        subText = remaining >= 0
+          ? `${fmt(remaining)} remaining · ${pace}`
+          : `${fmt(-remaining)} over budget · ${pace}`;
+      } else {
+        subZone = '';
+        subText = spent > 0 ? `Paid on ${txs[0].date}` : 'Not due this month';
+      }
+    } else {
+      const diff = spent - budget;
+      subZone = diff > 0 ? 'over' : diff < 0 ? 'ok' : '';
+      subText = diff > 0 ? `Month closed · ${fmt(diff)} over estimate`
+              : diff < 0 ? `Month closed · ${fmt(-diff)} under estimate`
+              : 'Month closed · on estimate';
+    }
+
+    const txHtml = txs.length
+      ? txs.map(t => `<div class="tx-row"><span>${t.date}${t.note ? ' · '+t.note : ''}</span><span class="val num">${fmt(t.amount)}</span></div>`).join('')
+      : `<div class="tx-empty">No transactions logged</div>`;
+
+    return `
+      <div class="cat-block">
+        <div class="ledger-row expandable" data-cat="${c}">
+          <span class="label">${c}${budget ? `<span class="tag pct ${zone}">${pct.toFixed(0)}% used</span>` : ''}</span>
+          <span class="leader"></span>
+          <span class="amount num">${fmt(spent)}</span>
+          <i class="ti ti-chevron-down expand-icon"></i>
+        </div>
+        <p class="cat-sub ${subZone}">${subText}</p>
+        <div class="tx-list">${txHtml}</div>
+      </div>`;
+  }).join('');
+
+  card.innerHTML = (rows || `<p class="state-msg">No transactions logged for this month yet</p>`) + (catList.length ? `
+    <div class="ledger-row total"><span class="label">Total expense</span><span class="leader"></span><span class="amount num">${fmt(total)}</span></div>` : '');
+
+  card.querySelectorAll('.ledger-row.expandable').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const block = row.closest('.cat-block');
+      const txList = block.querySelector('.tx-list');
+      const icon = row.querySelector('.expand-icon');
+      txList.classList.toggle('open');
+      icon.classList.toggle('open');
+    });
+  });
+}
+
+/* ============================================================
+ * LOAD + RENDER: INCOME/EXPENSE
+ * ============================================================ */
+async function loadAndRenderIncomeExpense(){
+  document.getElementById('breakdownCard').innerHTML = `<p class="state-msg">Loading…</p>`;
+  if (!cache[selectedMonth]){
+    try {
+      cache[selectedMonth] = await api('incomeExpense', { month: selectedMonth });
+    } catch (err){
+      document.getElementById('breakdownCard').innerHTML = `<p class="state-msg">Couldn't load data — check the Apps Script URL and deployment.</p>`;
+      return;
+    }
+  }
+  const data = cache[selectedMonth];
+  renderKpiCards(data);
+  renderBreakdown(data);
+}
+
+/* ============================================================
+ * ASSETS & LIABILITIES
+ * ============================================================ */
+async function loadAndRenderAssetsLiabilities(){
+  try {
+    const { assets, liabilities } = await api('assetsLiabilities');
+    const assetsCard = document.getElementById('assetsCard');
+    const liabCard = document.getElementById('liabCard');
+
+    assetsCard.innerHTML = assets.length ? assets.map(a => `
+      <div class="ledger-row"><span class="label">${a.label}${a.notes?`<span class="tag">${a.notes}</span>`:''}</span><span class="leader"></span><span class="amount num">${fmt(a.amount)}</span></div>`).join('')
+      : `<p class="state-msg">No assets entered yet</p>`;
+    const totalAssets = assets.reduce((s,a)=>s+a.amount,0);
+    if (assets.length) assetsCard.innerHTML += `<div class="ledger-row total"><span class="label">Total assets</span><span class="leader"></span><span class="amount num">${fmt(totalAssets)}</span></div>`;
+
+    liabCard.innerHTML = liabilities.length ? liabilities.map(l => `
+      <div class="ledger-row"><span class="label">${l.label}${l.notes?`<span class="tag">${l.notes}</span>`:''}</span><span class="leader"></span><span class="amount num">${fmt(l.amount)}</span></div>`).join('')
+      : `<p class="state-msg">No liabilities entered yet</p>`;
+    const totalLiab = liabilities.reduce((s,l)=>s+l.amount,0);
+    if (liabilities.length) liabCard.innerHTML += `<div class="ledger-row total"><span class="label">Total liabilities</span><span class="leader"></span><span class="amount num">${fmt(totalLiab)}</span></div>`;
+
+    document.getElementById('nwValue').textContent = fmt(totalAssets - totalLiab);
+  } catch (err){
+    document.getElementById('assetsCard').innerHTML = `<p class="state-msg">Couldn't load data</p>`;
+    document.getElementById('liabCard').innerHTML = `<p class="state-msg">Couldn't load data</p>`;
+  }
+}
+
+/* ============================================================
+ * INSURANCE
+ * ============================================================ */
+async function loadAndRenderInsurance(){
+  try {
+    const groups = await api('insurance');
+    document.getElementById('insuranceGroups').innerHTML = groups.length ? groups.map(g => `
+      <div class="ins-group">
+        <p class="ins-group-title">${g.group}</p>
+        <div class="ledger-card">
+          ${g.items.map(it => `
+            <div class="ins-row">
+              <span>${it.holder}<span class="holder">${it.company||''}</span></span>
+              <span class="val">${fmt(it.sumInsured)} <span class="holder">sum insured</span></span>
+              <span class="val">${fmt(it.premium)}${it.freq||''} <span class="holder">premium</span></span>
+              <span>${it.notes ? `<span class="holder">${it.notes}</span>` : ''}</span>
+              <span class="renewal">Renews ${it.renewal||'—'}</span>
+            </div>`).join('')}
+        </div>
+      </div>`).join('') : `<p class="state-msg">No policies entered yet</p>`;
+  } catch (err){
+    document.getElementById('insuranceGroups').innerHTML = `<p class="state-msg">Couldn't load data</p>`;
+  }
+}
+
+/* ============================================================
+ * META
+ * ============================================================ */
+async function loadMeta(){
+  try {
+    const { householdName } = await api('meta');
+    document.getElementById('householdName').textContent = householdName;
+  } catch (err){
+    document.getElementById('householdName').textContent = 'Household Ledger';
+  }
+}
+
+/* ============================================================
+ * INIT
+ * ============================================================ */
+(async function init(){
+  renderMonthPills();
+  renderViewPills();
+  loadMeta();
+  loadAndRenderIncomeExpense();
+  loadAndRenderAssetsLiabilities();
+  loadAndRenderInsurance();
+})();
+</script>
+</body>
+</html>
