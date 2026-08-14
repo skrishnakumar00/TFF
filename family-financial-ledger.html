@@ -19,7 +19,7 @@
     --rule:#C9C4B3; --rule-soft:#DEDACB;
   }
   *{box-sizing:border-box;}
-  body{margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans', sans-serif; font-size:15px; line-height:1.6;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans', sans-serif; font-size:15px; line-height:1.5;}
   .wrap{max-width:960px; margin:0 auto; padding:0 20px 64px;}
   .num{font-family:'IBM Plex Mono', monospace; font-variant-numeric:tabular-nums;}
 
@@ -29,13 +29,13 @@
   .household-name{font-family:'Fraunces', serif; font-weight:500; font-size:22px; margin:0; color:#FBFAF4;}
   .stamp{border:1.5px solid var(--gold-soft); color:var(--gold-soft); font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:5px 10px; border-radius:3px;}
 
-  .section{margin-top:40px;}
-  .section-head{display:flex; align-items:baseline; gap:10px; margin-bottom:16px; border-bottom:1.5px solid var(--ink); padding-bottom:8px;}
+  .section{margin-top:36px;}
+  .section-head{display:flex; align-items:baseline; gap:10px; margin-bottom:14px; border-bottom:1.5px solid var(--ink); padding-bottom:8px;}
   .section-index{font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--gold); font-weight:500;}
   .section-title{font-family:'Fraunces', serif; font-size:21px; font-weight:500; margin:0;}
   .section-note{margin-left:auto; font-size:12px; color:var(--ink-soft);}
 
-  .pill-row{display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;}
+  .pill-row{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
   .pill{font-family:'IBM Plex Mono', monospace; font-size:12.5px; background:none; border:1px solid var(--rule); color:var(--ink-soft); padding:7px 14px; border-radius:20px; cursor:pointer; display:flex; align-items:center; gap:6px;}
   .pill.active{background:var(--ledger); border-color:var(--ledger); color:#FBFAF4;}
   .pill .live-dot{width:6px; height:6px; border-radius:50%; background:var(--rust); display:inline-block;}
@@ -43,7 +43,7 @@
   .pill.ghost{background:none; border:1px solid var(--rule); color:var(--ink);}
   .pill.ghost.active{background:var(--gold); border-color:var(--gold); color:#2B2308;}
 
-  .kpi-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:24px;}
+  .kpi-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:22px;}
   @media (max-width:640px){ .kpi-grid{grid-template-columns:1fr;} }
   .kpi-card{background:var(--paper-raised); border:0.5px solid var(--rule); border-radius:10px; padding:16px 18px;}
   .kpi-head{font-size:11.5px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; margin:0 0 10px;}
@@ -57,61 +57,54 @@
 
   .col-label{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px 4px;}
 
-  .ledger-card{background:var(--paper-raised); border:0.5px solid var(--rule); border-radius:10px; padding:6px 20px; position:relative;}
-  .ledger-card::before{content:""; position:absolute; top:0; bottom:0; left:0; width:3px; background:var(--rust); opacity:0.5; border-radius:10px 0 0 10px;}
+  /* ---- Tables ---- */
+  .table-scroll{overflow-x:auto; border:0.5px solid var(--rule); border-radius:10px; background:var(--paper-raised);}
+  table{width:100%; border-collapse:collapse; font-size:13.5px; min-width:460px;}
+  thead th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); padding:10px 12px; border-bottom:1.5px solid var(--ink); white-space:nowrap;}
+  th.num, td.num{text-align:right;}
+  tbody td{padding:9px 12px; border-bottom:0.5px solid var(--rule-soft); vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
 
-  .subtype-block{margin-top:6px;}
-  .subtype-block:first-child{margin-top:0;}
-  .subtype-head{display:flex; justify-content:space-between; align-items:baseline; padding:10px 0 6px 14px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--gold); border-top:0.5px solid var(--rule-soft);}
-  .subtype-block:first-child .subtype-head{border-top:none; padding-top:2px;}
+  tr.subtype-row{cursor:pointer; background:rgba(185,138,61,0.08);}
+  tr.subtype-row td{font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; color:#8A6323;}
+  tr.subtype-row:hover{background:rgba(185,138,61,0.15);}
 
-  .ledger-row{display:flex; align-items:baseline; gap:8px; padding:10px 0 10px 14px; border-bottom:0.5px solid var(--rule-soft);}
-  .ledger-row .label{white-space:nowrap; font-size:14px;}
-  .ledger-row .tag{font-size:10.5px; font-family:'IBM Plex Mono', monospace; padding:1px 6px; border-radius:3px; margin-left:6px; background:var(--rule-soft); color:var(--ink-soft); white-space:normal;}
-  .ledger-row .tag.pct{font-weight:600; text-transform:uppercase;}
-  .ledger-row .tag.pct.ok{background:var(--teal-bg); color:var(--teal);}
-  .ledger-row .tag.pct.warn{background:rgba(185,138,61,0.18); color:#8A6323;}
-  .ledger-row .tag.pct.over{background:var(--rust-bg); color:var(--rust);}
-  .ledger-row .leader{flex:1; border-bottom:1px dotted #A9A38E; margin:0 4px 4px;}
-  .ledger-row .amount{font-weight:500; white-space:nowrap; font-size:14.5px;}
-  .ledger-row.total{padding-top:12px; margin-top:8px; border-top:2px solid var(--ink); border-bottom:none;}
-  .ledger-row.total .label, .ledger-row.total .amount{font-weight:600; font-size:15.5px;}
-  .ledger-row.expandable{cursor:pointer;}
-  .ledger-row.expandable:hover{background:rgba(0,0,0,0.02);}
-  .expand-icon{font-size:15px; color:var(--ink-soft); transition:transform .15s ease; flex-shrink:0;}
-  .expand-icon.open{transform:rotate(180deg);}
+  tr.category-row td:first-child{padding-left:30px;}
+  tr.category-row.expandable{cursor:pointer;}
+  tr.category-row.expandable:hover{background:rgba(0,0,0,0.025);}
 
-  .cat-sub{font-size:12px; padding:0 0 10px 14px; margin-top:-4px; color:var(--ink-soft);}
-  .cat-sub.over{color:var(--rust);}
-  .cat-sub.ok{color:var(--teal);}
-  .cat-sub.warn{color:#8A6323;}
+  tr.tx-row td{font-size:12px; color:var(--ink-soft); background:rgba(0,0,0,0.015); font-style:italic;}
+  tr.tx-row td:first-child{padding-left:48px;}
+  tr.tx-row td.num{font-style:normal;}
 
-  .tx-list{padding:0 0 8px 14px; display:none;}
-  .tx-list.open{display:block;}
-  .tx-row{display:flex; justify-content:space-between; font-size:12.5px; color:var(--ink-soft); padding:5px 0 5px 16px; border-bottom:0.5px dotted var(--rule-soft);}
-  .tx-row:last-child{border-bottom:none;}
-  .tx-row .val{font-family:'IBM Plex Mono',monospace;}
-  .tx-empty{font-size:12.5px; color:var(--ink-soft); padding:6px 0 6px 16px; font-style:italic;}
+  tr.total-row td{border-top:2px solid var(--ink); border-bottom:none; font-weight:600; font-size:14.5px;}
 
-  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
-  @media (max-width:640px){ .two-col{grid-template-columns:1fr;} }
+  .hidden{display:none;}
+
+  .chevron{font-size:14px; margin-right:6px; color:var(--ink-soft); transition:transform .15s ease; display:inline-block;}
+  .chevron.open{transform:rotate(90deg);}
+
+  .mini-tag{font-size:10px; font-family:'IBM Plex Mono',monospace; padding:1px 5px; border-radius:3px; margin-left:6px; font-weight:600; background:var(--rule-soft); color:var(--ink-soft);}
+  .mini-tag.ok{background:var(--teal-bg); color:var(--teal);}
+  .mini-tag.warn{background:rgba(185,138,61,0.18); color:#8A6323;}
+  .mini-tag.over{background:var(--rust-bg); color:var(--rust);}
+
+  .status-text{font-size:12.5px;}
+  .status-text.ok{color:var(--teal);}
+  .status-text.warn{color:#8A6323;}
+  .status-text.over{color:var(--rust);}
+  .status-text.neutral{color:var(--ink-soft);}
+  .notes-text{font-size:12px; color:var(--ink-soft);}
 
   .nw-line{display:flex; align-items:baseline; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
   .nw-line .nw-num{font-family:'Fraunces',serif; font-weight:500; font-size:26px;}
   .nw-line .nw-tag{font-size:12px; color:var(--ink-soft);}
 
-  .ins-group{margin-bottom:22px;}
-  .ins-group:last-child{margin-bottom:0;}
-  .ins-group-title{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--teal); margin:0 0 8px 4px; display:flex; align-items:center; gap:6px;}
-  .ins-row{display:grid; grid-template-columns:1.1fr 1fr 1fr 1fr 0.8fr; gap:10px; align-items:baseline; padding:10px 14px; border-bottom:0.5px solid var(--rule-soft); font-size:13px;}
-  .ins-row:last-child{border-bottom:none;}
-  .ins-row .holder{color:var(--ink-soft); font-size:11.5px; display:block;}
-  .ins-row .val{font-family:'IBM Plex Mono', monospace; font-weight:500;}
-  .ins-row .renewal{color:var(--ink-soft); font-size:12px; text-align:right;}
-  @media (max-width:720px){ .ins-row{grid-template-columns:1fr 1fr; row-gap:4px;} .ins-row .renewal{text-align:left;} }
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media (max-width:640px){ .two-col{grid-template-columns:1fr;} }
 
-  .state-msg{font-size:13px; color:var(--ink-soft); padding:20px 4px; font-style:italic;}
-  footer{margin-top:48px; text-align:center; font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+  .state-msg{font-size:13px; color:var(--ink-soft); padding:16px 4px; font-style:italic;}
+  footer{margin-top:44px; text-align:center; font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
 </style>
 </head>
 <body>
@@ -142,10 +135,10 @@
     <div class="pill-row" id="viewPills"></div>
 
     <p class="col-label" id="expenseLabel">Expense</p>
-    <div class="ledger-card" id="expenseBreakdownCard"><p class="state-msg">Loading…</p></div>
+    <div id="expenseBreakdownCard"><p class="state-msg">Loading…</p></div>
 
     <p class="col-label" id="incomeLabel" style="margin-top:22px;">Income</p>
-    <div class="ledger-card" id="incomeBreakdownCard"><p class="state-msg">Loading…</p></div>
+    <div id="incomeBreakdownCard"><p class="state-msg">Loading…</p></div>
   </div>
 
   <!-- 02 Assets & Liabilities -->
@@ -161,11 +154,11 @@
     <div class="two-col">
       <div>
         <p class="col-label">Assets</p>
-        <div class="ledger-card" id="assetsCard"><p class="state-msg">Loading…</p></div>
+        <div id="assetsCard"><p class="state-msg">Loading…</p></div>
       </div>
       <div>
         <p class="col-label">Liabilities</p>
-        <div class="ledger-card" id="liabCard"><p class="state-msg">Loading…</p></div>
+        <div id="liabCard"><p class="state-msg">Loading…</p></div>
       </div>
     </div>
   </div>
@@ -212,8 +205,7 @@ let selectedView = 'actual';
 const cache = {};
 
 /* ============================================================
- * MONTH PILLS — range comes from Apps Script (earliest data found
- * through the current month), not assumed client-side
+ * MONTH PILLS
  * ============================================================ */
 function renderMonthPills(){
   document.getElementById('monthPills').innerHTML = months.map(m => `
@@ -248,7 +240,7 @@ function renderViewPills(){
 }
 
 /* ============================================================
- * KPI CARDS — difference amount instead of a ratio
+ * KPI CARDS
  * ============================================================ */
 function renderKpiCards(data){
   const { estimate } = data;
@@ -294,10 +286,10 @@ function spentFor(data, cat){
 }
 
 /* ============================================================
- * EXPENSE BREAKDOWN — grouped by Subtype, sorted biggest-first,
- * each row shows its % of that subtype's subtotal
+ * EXPENSE TABLE — Subtype > Category > Transaction accordion,
+ * collapsed by default. % is always % of total expense.
  * ============================================================ */
-function renderExpenseBreakdown(data){
+function renderExpenseTable(data){
   document.getElementById('expenseLabel').textContent = 'Expense — ' + (selectedView === 'estimated' ? 'Estimated' : 'Actual');
   const card = document.getElementById('expenseBreakdownCard');
   const { estimate, actual, isCurrent, dayOfMonth, daysInMonth, categoryMeta } = data;
@@ -309,13 +301,9 @@ function renderExpenseBreakdown(data){
     return;
   }
 
-  const amountFor = c => {
-    if (selectedView === 'estimated'){
-      const e = estimate.expense.find(x=>x.label===c);
-      return e ? e.amount : 0;
-    }
-    return spentFor(data, c);
-  };
+  const amountFor = c => selectedView === 'estimated'
+    ? ((estimate.expense.find(x=>x.label===c)||{}).amount || 0)
+    : spentFor(data, c);
 
   const subtypeOrder = [];
   const groups = {};
@@ -325,100 +313,136 @@ function renderExpenseBreakdown(data){
     groups[st].push(c);
   });
 
-  let grandTotal = 0;
-  const blocksHtml = subtypeOrder.map(st => {
+  const subtypeData = subtypeOrder.map(st => {
     const cats = groups[st].slice().sort((a,b) => amountFor(b) - amountFor(a));
     const subtotal = cats.reduce((s,c)=>s+amountFor(c),0);
-    grandTotal += subtotal;
+    return { st, cats, subtotal };
+  });
+  const grandTotal = subtypeData.reduce((s,g)=>s+g.subtotal,0);
 
-    const rowsHtml = cats.map(c => {
+  const headerCells = selectedView === 'estimated'
+    ? '<th>Category</th><th class="num">Amount</th><th class="num">% of total</th><th>Notes</th>'
+    : '<th>Category</th><th class="num">Amount</th><th class="num">% of total</th><th>Status</th>';
+
+  let bodyRows = '';
+  subtypeData.forEach((g, i) => {
+    const stPct = grandTotal ? g.subtotal/grandTotal*100 : 0;
+    bodyRows += `
+      <tr class="subtype-row" id="st-${i}">
+        <td><i class="ti ti-chevron-right chevron"></i>${g.st}</td>
+        <td class="num">${fmt(g.subtotal)}</td>
+        <td class="num">${stPct.toFixed(0)}%</td>
+        <td></td>
+      </tr>`;
+
+    g.cats.forEach((c, j) => {
       const amount = amountFor(c);
-      const pctOfSubtotal = subtotal ? (amount/subtotal*100) : 0;
+      const pctOfTotal = grandTotal ? amount/grandTotal*100 : 0;
 
       if (selectedView === 'estimated'){
         const e = estimate.expense.find(x=>x.label===c);
-        const notes = e && e.notes ? `<span class="tag">${e.notes}</span>` : '';
-        return `
-          <div class="cat-block">
-            <div class="ledger-row"><span class="label">${c}${notes}</span><span class="leader"></span><span class="amount num">${fmt(amount)}</span></div>
-            <p class="cat-sub">${pctOfSubtotal.toFixed(0)}% of ${st} estimate</p>
-          </div>`;
+        bodyRows += `
+          <tr class="category-row hidden cat-under-st-${i}" id="cat-${i}-${j}">
+            <td>${c}</td>
+            <td class="num">${fmt(amount)}</td>
+            <td class="num">${pctOfTotal.toFixed(0)}%</td>
+            <td class="notes-text">${e && e.notes ? e.notes : ''}</td>
+          </tr>`;
+        return;
       }
 
       const budgetEntry = estimate.expense.find(e=>e.label===c);
       const budget = budgetEntry ? budgetEntry.amount : 0;
       const txs = actual.expense[c] || [];
-      const spent = amount;
-      const pct = budget ? (spent/budget*100) : 0;
-      const zone = zoneColor(pct);
+      const pct = budget ? (amount/budget*100) : 0;
+      const usedZone = zoneColor(pct);
       const discretionary = categoryMeta[c] ? categoryMeta[c].discretionary : false;
 
-      let subText, subZone;
+      let statusText, statusZone;
       if (isCurrent){
         if (discretionary){
-          const remaining = budget - spent;
+          const remaining = budget - amount;
           const gap = pct - elapsedPct;
-          const pace = gap > 15 ? 'Ahead of pace' : gap < -15 ? 'Under pace' : 'On pace';
-          subZone = remaining < 0 ? 'over' : (gap > 15 ? 'over' : gap < -15 ? 'ok' : 'warn');
-          subText = (remaining >= 0
-            ? `${fmt(remaining)} remaining · ${pace}`
-            : `${fmt(-remaining)} over budget · ${pace}`) + ` · ${pctOfSubtotal.toFixed(0)}% of ${st} spend`;
+          const pace = gap > 15 ? 'ahead of pace' : gap < -15 ? 'under pace' : 'on pace';
+          statusZone = remaining < 0 ? 'over' : (gap > 15 ? 'over' : gap < -15 ? 'ok' : 'warn');
+          statusText = remaining >= 0 ? `${fmt(remaining)} left · ${pace}` : `${fmt(-remaining)} over · ${pace}`;
         } else {
-          subZone = '';
-          subText = (spent > 0 ? `Paid on ${txs[0].date}` : 'Not due this month') + ` · ${pctOfSubtotal.toFixed(0)}% of ${st} spend`;
+          statusZone = 'neutral';
+          statusText = amount > 0 ? `Paid ${txs[0] ? txs[0].date : ''}` : 'Not due';
         }
       } else {
-        const diff = spent - budget;
-        subZone = diff > 0 ? 'over' : diff < 0 ? 'ok' : '';
-        subText = (diff > 0 ? `Month closed · ${fmt(diff)} over estimate`
-                : diff < 0 ? `Month closed · ${fmt(-diff)} under estimate`
-                : 'Month closed · on estimate') + ` · ${pctOfSubtotal.toFixed(0)}% of ${st} spend`;
+        const diff = amount - budget;
+        statusZone = diff > 0 ? 'over' : diff < 0 ? 'ok' : 'neutral';
+        statusText = diff > 0 ? `${fmt(diff)} over` : diff < 0 ? `${fmt(-diff)} under` : 'On estimate';
       }
 
-      const txHtml = txs.length
-        ? txs.map(t => `<div class="tx-row"><span>${t.date}${t.note ? ' · '+t.note : ''}</span><span class="val num">${fmt(t.amount)}</span></div>`).join('')
-        : `<div class="tx-empty">No transactions logged</div>`;
+      const budgetTag = budget ? `<span class="mini-tag ${usedZone}">${pct.toFixed(0)}%</span>` : '';
+      bodyRows += `
+        <tr class="category-row expandable hidden cat-under-st-${i}" id="cat-${i}-${j}">
+          <td><i class="ti ti-chevron-right chevron"></i>${c}</td>
+          <td class="num">${fmt(amount)}${budgetTag}</td>
+          <td class="num">${pctOfTotal.toFixed(0)}%</td>
+          <td><span class="status-text ${statusZone}">${statusText}</span></td>
+        </tr>`;
 
-      return `
-        <div class="cat-block">
-          <div class="ledger-row expandable" data-cat="${c}">
-            <span class="label">${c}${budget ? `<span class="tag pct ${zone}">${pct.toFixed(0)}% used</span>` : ''}</span>
-            <span class="leader"></span>
-            <span class="amount num">${fmt(spent)}</span>
-            <i class="ti ti-chevron-down expand-icon"></i>
-          </div>
-          <p class="cat-sub ${subZone}">${subText}</p>
-          <div class="tx-list">${txHtml}</div>
-        </div>`;
-    }).join('');
+      if (txs.length){
+        txs.forEach(t => {
+          bodyRows += `
+            <tr class="tx-row hidden tx-under-cat-${i}-${j}">
+              <td colspan="3">${t.date}${t.note ? ' · '+t.note : ''}</td>
+              <td class="num">${fmt(t.amount)}</td>
+            </tr>`;
+        });
+      } else {
+        bodyRows += `<tr class="tx-row hidden tx-under-cat-${i}-${j}"><td colspan="4">No transactions logged</td></tr>`;
+      }
+    });
+  });
 
-    return `
-      <div class="subtype-block">
-        <div class="subtype-head"><span>${st}</span><span class="num">${fmt(subtotal)}</span></div>
-        ${rowsHtml}
-      </div>`;
-  }).join('');
+  bodyRows += `
+    <tr class="total-row">
+      <td>Total expense</td><td class="num">${fmt(grandTotal)}</td><td class="num">100%</td><td></td>
+    </tr>`;
 
-  card.innerHTML = blocksHtml + `
-    <div class="ledger-row total"><span class="label">Total expense</span><span class="leader"></span><span class="amount num">${fmt(grandTotal)}</span></div>`;
+  card.innerHTML = `<div class="table-scroll"><table><thead><tr>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>`;
+
+  subtypeData.forEach((g, i) => {
+    const stRow = document.getElementById(`st-${i}`);
+    stRow.addEventListener('click', () => {
+      const chevron = stRow.querySelector('.chevron');
+      const willOpen = !chevron.classList.contains('open');
+      chevron.classList.toggle('open', willOpen);
+      g.cats.forEach((c, j) => {
+        const catRow = document.getElementById(`cat-${i}-${j}`);
+        catRow.classList.toggle('hidden', !willOpen);
+        if (!willOpen){
+          const catChevron = catRow.querySelector('.chevron');
+          if (catChevron) catChevron.classList.remove('open');
+          document.querySelectorAll(`.tx-under-cat-${i}-${j}`).forEach(tx => tx.classList.add('hidden'));
+        }
+      });
+    });
+  });
 
   if (selectedView === 'actual'){
-    card.querySelectorAll('.ledger-row.expandable').forEach(row=>{
-      row.addEventListener('click', ()=>{
-        const block = row.closest('.cat-block');
-        const txList = block.querySelector('.tx-list');
-        const icon = row.querySelector('.expand-icon');
-        txList.classList.toggle('open');
-        icon.classList.toggle('open');
+    subtypeData.forEach((g, i) => {
+      g.cats.forEach((c, j) => {
+        const catRow = document.getElementById(`cat-${i}-${j}`);
+        catRow.addEventListener('click', () => {
+          const chevron = catRow.querySelector('.chevron');
+          const willOpen = !chevron.classList.contains('open');
+          chevron.classList.toggle('open', willOpen);
+          document.querySelectorAll(`.tx-under-cat-${i}-${j}`).forEach(row => row.classList.toggle('hidden', !willOpen));
+        });
       });
     });
   }
 }
 
 /* ============================================================
- * INCOME BREAKDOWN — flat list, same view toggle
+ * INCOME TABLE — flat, no accordion, no % column
  * ============================================================ */
-function renderIncomeBreakdown(data){
+function renderIncomeTable(data){
   document.getElementById('incomeLabel').textContent = 'Income — ' + (selectedView === 'estimated' ? 'Estimated' : 'Actual');
   const card = document.getElementById('incomeBreakdownCard');
   const list = selectedView === 'estimated' ? data.estimate.income : data.actual.income;
@@ -428,19 +452,18 @@ function renderIncomeBreakdown(data){
     return;
   }
   const total = list.reduce((s,i)=>s+i.amount,0);
-  card.innerHTML = list.map(i => `
-    <div class="ledger-row">
-      <span class="label">${i.label}${i.notes?`<span class="tag">${i.notes}</span>`:''}</span>
-      <span class="leader"></span>
-      <span class="amount num">${fmt(i.amount)}</span>
-    </div>`).join('') + `
-    <div class="ledger-row total"><span class="label">Total income</span><span class="leader"></span><span class="amount num">${fmt(total)}</span></div>`;
+  const rows = list.map(i => `
+    <tr><td>${i.label}</td><td class="num">${fmt(i.amount)}</td><td class="notes-text">${i.notes||''}</td></tr>`).join('');
+  card.innerHTML = `<div class="table-scroll"><table>
+    <thead><tr><th>Source</th><th class="num">Amount</th><th>Notes</th></tr></thead>
+    <tbody>${rows}<tr class="total-row"><td>Total income</td><td class="num">${fmt(total)}</td><td></td></tr></tbody>
+  </table></div>`;
 }
 
 function renderBreakdown(data){
   if (!data) return;
-  renderExpenseBreakdown(data);
-  renderIncomeBreakdown(data);
+  renderExpenseTable(data);
+  renderIncomeTable(data);
 }
 
 /* ============================================================
@@ -463,26 +486,25 @@ async function loadAndRenderIncomeExpense(){
 }
 
 /* ============================================================
- * ASSETS & LIABILITIES
+ * ASSETS & LIABILITIES — plain tables, no % column
  * ============================================================ */
 async function loadAndRenderAssetsLiabilities(){
   try {
     const { assets, liabilities } = await api('assetsLiabilities');
-    const assetsCard = document.getElementById('assetsCard');
-    const liabCard = document.getElementById('liabCard');
-
-    assetsCard.innerHTML = assets.length ? assets.map(a => `
-      <div class="ledger-row"><span class="label">${a.label}${a.notes?`<span class="tag">${a.notes}</span>`:''}</span><span class="leader"></span><span class="amount num">${fmt(a.amount)}</span></div>`).join('')
-      : `<p class="state-msg">No assets entered yet</p>`;
+    const buildTable = (items, totalLabel) => {
+      if (!items.length) return `<p class="state-msg">No entries yet</p>`;
+      const total = items.reduce((s,x)=>s+x.amount,0);
+      const rows = items.map(x => `
+        <tr><td>${x.label}</td><td class="num">${fmt(x.amount)}</td><td class="notes-text">${x.notes||''}</td></tr>`).join('');
+      return `<div class="table-scroll"><table>
+        <thead><tr><th>Label</th><th class="num">Amount</th><th>Notes</th></tr></thead>
+        <tbody>${rows}<tr class="total-row"><td>${totalLabel}</td><td class="num">${fmt(total)}</td><td></td></tr></tbody>
+      </table></div>`;
+    };
+    document.getElementById('assetsCard').innerHTML = buildTable(assets, 'Total assets');
+    document.getElementById('liabCard').innerHTML = buildTable(liabilities, 'Total liabilities');
     const totalAssets = assets.reduce((s,a)=>s+a.amount,0);
-    if (assets.length) assetsCard.innerHTML += `<div class="ledger-row total"><span class="label">Total assets</span><span class="leader"></span><span class="amount num">${fmt(totalAssets)}</span></div>`;
-
-    liabCard.innerHTML = liabilities.length ? liabilities.map(l => `
-      <div class="ledger-row"><span class="label">${l.label}${l.notes?`<span class="tag">${l.notes}</span>`:''}</span><span class="leader"></span><span class="amount num">${fmt(l.amount)}</span></div>`).join('')
-      : `<p class="state-msg">No liabilities entered yet</p>`;
     const totalLiab = liabilities.reduce((s,l)=>s+l.amount,0);
-    if (liabilities.length) liabCard.innerHTML += `<div class="ledger-row total"><span class="label">Total liabilities</span><span class="leader"></span><span class="amount num">${fmt(totalLiab)}</span></div>`;
-
     document.getElementById('nwValue').textContent = fmt(totalAssets - totalLiab);
   } catch (err){
     document.getElementById('assetsCard').innerHTML = `<p class="state-msg">Couldn't load data</p>`;
@@ -491,25 +513,25 @@ async function loadAndRenderAssetsLiabilities(){
 }
 
 /* ============================================================
- * INSURANCE
+ * INSURANCE — single flat table
  * ============================================================ */
 async function loadAndRenderInsurance(){
   try {
     const groups = await api('insurance');
-    document.getElementById('insuranceGroups').innerHTML = groups.length ? groups.map(g => `
-      <div class="ins-group">
-        <p class="ins-group-title">${g.group}</p>
-        <div class="ledger-card">
-          ${g.items.map(it => `
-            <div class="ins-row">
-              <span>${it.holder}<span class="holder">${it.company||''}</span></span>
-              <span class="val">${fmt(it.sumInsured)} <span class="holder">sum insured</span></span>
-              <span class="val">${fmt(it.premium)}${it.freq||''} <span class="holder">premium</span></span>
-              <span>${it.notes ? `<span class="holder">${it.notes}</span>` : ''}</span>
-              <span class="renewal">Renews ${it.renewal||'—'}</span>
-            </div>`).join('')}
-        </div>
-      </div>`).join('') : `<p class="state-msg">No policies entered yet</p>`;
+    const card = document.getElementById('insuranceGroups');
+    if (!groups.length){ card.innerHTML = `<p class="state-msg">No policies entered yet</p>`; return; }
+    const rows = [];
+    groups.forEach(g => g.items.forEach(it => {
+      rows.push(`<tr>
+        <td>${g.group}</td><td>${it.holder}</td><td>${it.company||''}</td>
+        <td class="num">${fmt(it.sumInsured)}</td><td class="num">${fmt(it.premium)}${it.freq||''}</td>
+        <td>${it.renewal||'—'}</td><td class="notes-text">${it.notes||''}</td>
+      </tr>`);
+    }));
+    card.innerHTML = `<div class="table-scroll"><table>
+      <thead><tr><th>Group</th><th>Holder</th><th>Company</th><th class="num">Sum insured</th><th class="num">Premium</th><th>Renewal</th><th>Notes</th></tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table></div>`;
   } catch (err){
     document.getElementById('insuranceGroups').innerHTML = `<p class="state-msg">Couldn't load data</p>`;
   }
@@ -528,7 +550,7 @@ async function loadMeta(){
 }
 
 /* ============================================================
- * INIT — month range comes from Apps Script before anything renders
+ * INIT
  * ============================================================ */
 (async function init(){
   loadMeta();
