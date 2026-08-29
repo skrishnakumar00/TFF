@@ -50,6 +50,18 @@
   .target-edit input{width:56px;}
   .link-btn{background:none; border:none; color:var(--gold); font-size:12px; font-family:'IBM Plex Mono',monospace; cursor:pointer; text-decoration:underline; padding:0;}
 
+  .progress-wrap{margin-top:18px; padding-top:8px;}
+  .progress-track{position:relative; height:20px; border-radius:6px; background:var(--rule-soft); margin-top:20px;}
+  .progress-fill{position:absolute; top:0; left:0; height:100%; border-radius:6px; transition:width .3s ease;}
+  .progress-marker{position:absolute; top:-3px; height:26px; width:0; border-left-width:2px; border-left-style:solid; border-color:var(--ink-soft);}
+  .progress-marker.target{border-left-style:dashed; border-color:var(--ledger);}
+  .progress-marker-label{position:absolute; top:-17px; font-size:10px; font-family:'IBM Plex Mono',monospace; white-space:nowrap; transform:translateX(-50%); color:var(--ink-soft);}
+  .progress-marker-label.target{color:var(--ledger); font-weight:600;}
+  .progress-caption{margin-top:8px; font-size:13px; font-weight:600;}
+  .progress-caption.ok{color:var(--teal);}
+  .progress-caption.warn{color:#8A6323;}
+  .progress-caption.over{color:var(--rust);}
+
   input, select{font-family:'IBM Plex Sans',sans-serif; font-size:13.5px; padding:7px 9px; border-radius:6px; border:1px solid var(--rule); background:#fff; color:var(--ink);}
   button.btn{font-family:'IBM Plex Mono',monospace; font-size:12.5px; background:var(--ledger); color:#FBFAF4; border:none; padding:8px 14px; border-radius:6px; cursor:pointer;}
   button.btn.secondary{background:none; border:1px solid var(--rule); color:var(--ink);}
@@ -84,7 +96,7 @@
   .variance{font-size:11px; margin-left:5px;}
   .variance.over{color:var(--rust);}
   .variance.ok{color:var(--teal);}
-  .notes-text{font-size:11.5px; color:var(--ink-soft); display:block; margin-top:2px; max-width:220px;}
+  .notes-text-cell{font-size:11.5px; color:var(--ink-soft); max-width:160px;}
 
   tr.total-row td{border-top:2px solid var(--ink); border-bottom:none; font-weight:600; font-size:13.5px;}
 
@@ -272,24 +284,56 @@ function renderExceptionsBanner(exceptions){
 
 function renderTargetCard(data){
   const card = document.getElementById('targetCard');
-  const pctOfEst = data.estTotal ? (data.actTotal / data.estTotal * 100) : 0;
+  const { estTotal, actTotal, targetPct, targetActual } = data;
+  const pctOfEst = estTotal ? (actTotal / estTotal * 100) : 0;
+
+  // Dynamic scale: if actual exceeds estimate, stretch the track with headroom
+  // so the plan line visibly shifts left instead of the fill being clipped.
+  const overEstimate = actTotal > estTotal;
+  const scale = overEstimate ? actTotal * 1.08 : (estTotal || 1);
+  const planPos = Math.min(100, (estTotal / scale) * 100);
+  const targetPos = (targetPct !== null) ? (targetActual / scale) * 100 : null;
+  const fillPos = Math.min(100, (actTotal / scale) * 100);
+
+  let zone, captionText;
+  if (targetPct !== null){
+    if (actTotal <= targetActual){ zone = 'ok'; captionText = `${fmt(targetActual - actTotal)} under target`; }
+    else if (actTotal <= estTotal){ zone = 'warn'; captionText = `${fmt(actTotal - targetActual)} over target, within plan`; }
+    else { zone = 'over'; captionText = `${fmt(actTotal - estTotal)} over plan`; }
+  } else {
+    if (actTotal <= estTotal){ zone = 'ok'; captionText = `${fmt(estTotal - actTotal)} under estimate`; }
+    else { zone = 'over'; captionText = `${fmt(actTotal - estTotal)} over estimate`; }
+  }
+  const zoneColorMap = { ok: 'var(--teal)', warn: 'var(--gold)', over: 'var(--rust)' };
+
   card.innerHTML = `
-    <div class="card-line"><span>Estimate total</span><span class="val">${fmt(data.estTotal)}</span></div>
-    <div class="card-line"><span>Actual so far</span><span class="val">${fmt(data.actTotal)} <span style="color:var(--ink-soft);">(${pctOfEst.toFixed(0)}%)</span></span></div>
+    <div class="card-line"><span>Estimate total</span><span class="val">${fmt(estTotal)}</span></div>
+    <div class="card-line"><span>Actual so far</span><span class="val">${fmt(actTotal)} <span style="color:var(--ink-soft);">(${pctOfEst.toFixed(0)}%)</span></span></div>
     <div class="target-row">
       <span style="font-size:13px;">Target reduction</span>
       <span>
-        ${data.targetPct !== null ? `<span class="num" style="font-weight:600;">${data.targetPct}%</span>` : `<span style="color:var(--ink-soft); font-size:12.5px;">not set</span>`}
+        ${targetPct !== null ? `<span class="num" style="font-weight:600;">${targetPct}%</span>` : `<span style="color:var(--ink-soft); font-size:12.5px;">not set</span>`}
         <button class="link-btn" id="btnEditTarget" style="margin-left:8px;">edit</button>
       </span>
     </div>
     <div id="targetEditRow" style="display:none; margin-top:8px;">
       <div class="target-edit">
-        <input type="number" id="targetPctInput" value="${data.targetPct !== null ? data.targetPct : ''}" step="0.5">
+        <input type="number" id="targetPctInput" value="${targetPct !== null ? targetPct : ''}" step="0.5">
         <span style="font-size:12.5px;">%</span>
         <button class="btn" id="targetSaveBtn" style="padding:6px 10px;">Save</button>
       </div>
       <p class="form-msg" id="targetMsg"></p>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${fillPos}%; background:${zoneColorMap[zone]};"></div>
+        ${targetPos !== null ? `
+          <div class="progress-marker target" style="left:${targetPos}%;"></div>
+          <div class="progress-marker-label target" style="left:${targetPos}%;">Target</div>` : ''}
+        <div class="progress-marker plan" style="left:${planPos}%;"></div>
+        <div class="progress-marker-label" style="left:${planPos}%;">Plan</div>
+      </div>
+      <p class="progress-caption ${zone}">${captionText}</p>
     </div>`;
 
   document.getElementById('btnEditTarget').addEventListener('click', ()=>{
@@ -328,14 +372,13 @@ function renderExpenseTable(data){
   });
 
   const grandEstTotal = data.estTotal;
-  const grandActTotal = data.actTotal;
 
   let bodyRows = '';
   subtypeOrder.forEach((st, i) => {
     const cats = groups[st].slice().sort((a,b) => b.actualAmount - a.actualAmount);
     const stEst = cats.reduce((s,c)=>s+c.estAmount,0);
     const stAct = cats.reduce((s,c)=>s+c.actualAmount,0);
-    const stPct = grandActTotal ? (stAct/grandActTotal*100) : 0;
+    const stPct = grandEstTotal ? (stEst/grandEstTotal*100) : 0;
 
     bodyRows += `
       <tr class="subtype-row" id="st-${i}">
@@ -343,31 +386,33 @@ function renderExpenseTable(data){
         <td class="num">${fmt(stEst)}</td>
         <td class="num">${fmt(stAct)}</td>
         <td class="num">${stPct.toFixed(0)}%</td>
+        <td></td>
       </tr>`;
 
     cats.forEach((c, j) => {
-      const pctOfTotal = grandActTotal ? (c.actualAmount/grandActTotal*100) : 0;
+      const pctOfTotal = grandEstTotal ? (c.estAmount/grandEstTotal*100) : 0;
       const diff = c.actualAmount - c.estAmount;
       const varianceHtml = c.estAmount
         ? `<span class="variance ${diff>0?'over':'ok'}">${diff>0?'+':''}${fmt(diff)}</span>`
         : '';
       bodyRows += `
         <tr class="category-row hidden cat-under-st-${i}" id="cat-${i}-${j}">
-          <td>${c.category}${c.notes ? `<span class="notes-text">${c.notes}</span>` : ''}</td>
+          <td>${c.category}</td>
           <td class="num">${fmt(c.estAmount)}</td>
           <td class="num">${fmt(c.actualAmount)}${varianceHtml}</td>
           <td class="num">${pctOfTotal.toFixed(0)}%</td>
+          <td class="notes-text-cell">${c.notes || ''}</td>
         </tr>`;
     });
   });
 
   bodyRows += `
     <tr class="total-row">
-      <td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td class="num">${fmt(grandActTotal)}</td><td class="num">100%</td>
+      <td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td class="num">${fmt(data.actTotal)}</td><td class="num">100%</td><td></td>
     </tr>`;
 
   wrap.innerHTML = `<div class="table-scroll"><table>
-    <thead><tr><th>Category</th><th class="num">Est</th><th class="num">Actual</th><th class="num">% of total</th></tr></thead>
+    <thead><tr><th>Category</th><th class="num">Est</th><th class="num">Actual</th><th class="num">% of total</th><th>Notes</th></tr></thead>
     <tbody>${bodyRows}</tbody>
   </table></div>`;
 
