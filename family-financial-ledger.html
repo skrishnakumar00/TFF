@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Household Financial Ledger</title>
+<title>Expense Control</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -20,91 +20,76 @@
   }
   *{box-sizing:border-box;}
   body{margin:0; background:var(--paper); color:var(--ink); font-family:'IBM Plex Sans', sans-serif; font-size:15px; line-height:1.5;}
-  .wrap{max-width:960px; margin:0 auto; padding:0 20px 64px;}
+  .wrap{max-width:720px; margin:0 auto; padding:0 16px 64px;}
   .num{font-family:'IBM Plex Mono', monospace; font-variant-numeric:tabular-nums;}
 
-  .masthead{background:var(--ledger); color:#EFEAD9; padding:22px 20px; border-radius:0 0 14px 14px;}
-  .masthead-inner{max-width:960px; margin:0 auto; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px;}
-  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.12em; text-transform:uppercase; color:#B9C4B5; margin:0 0 4px;}
-  .household-name{font-family:'Fraunces', serif; font-weight:500; font-size:22px; margin:0; color:#FBFAF4;}
-  .stamp{border:1.5px solid var(--gold-soft); color:var(--gold-soft); font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:5px 10px; border-radius:3px;}
+  .masthead{background:var(--ledger); color:#EFEAD9; padding:20px 16px; border-radius:0 0 14px 14px;}
+  .masthead-inner{max-width:720px; margin:0 auto; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:#B9C4B5; margin:0 0 4px;}
+  .household-name{font-family:'Fraunces', serif; font-weight:500; font-size:20px; margin:0; color:#FBFAF4;}
+  .stamp{border:1.5px solid var(--gold-soft); color:var(--gold-soft); font-family:'IBM Plex Mono', monospace; font-size:11px; padding:4px 9px; border-radius:3px;}
 
-  .section{margin-top:36px;}
-  .section-head{display:flex; align-items:baseline; gap:10px; margin-bottom:14px; border-bottom:1.5px solid var(--ink); padding-bottom:8px;}
-  .section-index{font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--gold); font-weight:500;}
-  .section-title{font-family:'Fraunces', serif; font-size:21px; font-weight:500; margin:0;}
-  .section-note{margin-left:auto; font-size:12px; color:var(--ink-soft);}
+  .section{margin-top:28px;}
+  .col-label{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px 2px;}
 
-  .pill-row{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;}
-  .pill{font-family:'IBM Plex Mono', monospace; font-size:12.5px; background:none; border:1px solid var(--rule); color:var(--ink-soft); padding:7px 14px; border-radius:20px; cursor:pointer; display:flex; align-items:center; gap:6px;}
+  .pill-row{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; overflow-x:auto;}
+  .pill{font-family:'IBM Plex Mono', monospace; font-size:12.5px; background:none; border:1px solid var(--rule); color:var(--ink-soft); padding:7px 14px; border-radius:20px; cursor:pointer; white-space:nowrap;}
   .pill.active{background:var(--ledger); border-color:var(--ledger); color:#FBFAF4;}
-  .pill .live-dot{width:6px; height:6px; border-radius:50%; background:var(--rust); display:inline-block;}
-  .pill.active .live-dot{background:#E7A38F;}
-  .pill.ghost{background:none; border:1px solid var(--rule); color:var(--ink);}
-  .pill.ghost.active{background:var(--gold); border-color:var(--gold); color:#2B2308;}
 
-  .kpi-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:22px;}
-  @media (max-width:640px){ .kpi-grid{grid-template-columns:1fr;} }
-  .kpi-card{background:var(--paper-raised); border:0.5px solid var(--rule); border-radius:10px; padding:16px 18px;}
-  .kpi-head{font-size:11.5px; text-transform:uppercase; letter-spacing:0.08em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; margin:0 0 10px;}
-  .kpi-line{display:flex; justify-content:space-between; font-size:13.5px; padding:4px 0;}
-  .kpi-line .val{font-family:'IBM Plex Mono',monospace;}
-  .kpi-diff{display:flex; justify-content:space-between; align-items:baseline; margin-top:10px; padding-top:8px; border-top:0.5px dashed var(--rule);}
-  .kpi-diff-label{font-size:12.5px; font-weight:600;}
-  .kpi-diff-val{font-size:21px; font-weight:600; font-family:'IBM Plex Mono',monospace;}
-  .kpi-diff.ok .kpi-diff-label, .kpi-diff.ok .kpi-diff-val{color:var(--teal);}
-  .kpi-diff.over .kpi-diff-label, .kpi-diff.over .kpi-diff-val{color:var(--rust);}
+  .banner{display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; margin-bottom:14px; font-size:13px;}
+  .banner.warn{background:rgba(185,138,61,0.14); color:#7A5A1E;}
+  .banner.error{background:var(--rust-bg); color:var(--rust);}
+  .banner i{font-size:16px; margin-top:1px; flex-shrink:0;}
+  .banner ul{margin:4px 0 0; padding-left:18px;}
 
-  .col-label{font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px 4px;}
+  .card{background:var(--paper-raised); border:0.5px solid var(--rule); border-radius:10px; padding:14px 16px; margin-bottom:14px;}
+  .card-line{display:flex; justify-content:space-between; font-size:13.5px; padding:4px 0;}
+  .card-line .val{font-family:'IBM Plex Mono',monospace;}
+  .target-row{display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:0.5px dashed var(--rule);}
+  .target-edit{display:flex; align-items:center; gap:6px;}
+  .target-edit input{width:56px;}
+  .link-btn{background:none; border:none; color:var(--gold); font-size:12px; font-family:'IBM Plex Mono',monospace; cursor:pointer; text-decoration:underline; padding:0;}
 
-  /* ---- Tables ---- */
+  input, select{font-family:'IBM Plex Sans',sans-serif; font-size:13.5px; padding:7px 9px; border-radius:6px; border:1px solid var(--rule); background:#fff; color:var(--ink);}
+  button.btn{font-family:'IBM Plex Mono',monospace; font-size:12.5px; background:var(--ledger); color:#FBFAF4; border:none; padding:8px 14px; border-radius:6px; cursor:pointer;}
+  button.btn.secondary{background:none; border:1px solid var(--rule); color:var(--ink);}
+  button.btn:disabled{opacity:0.5; cursor:default;}
+
+  .action-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+  .action-row button{flex:1; min-width:130px;}
+
+  .form-panel{background:var(--paper-raised); border:0.5px solid var(--rule); border-radius:10px; padding:14px 16px; margin-bottom:14px; display:none;}
+  .form-panel.open{display:block;}
+  .form-row{display:flex; flex-direction:column; gap:4px; margin-bottom:10px;}
+  .form-row label{font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+  .form-actions{display:flex; gap:8px; margin-top:4px;}
+  .form-msg{font-size:12.5px; margin-top:8px;}
+  .form-msg.ok{color:var(--teal);}
+  .form-msg.error{color:var(--rust);}
+
   .table-scroll{overflow-x:auto; border:0.5px solid var(--rule); border-radius:10px; background:var(--paper-raised);}
-  table{width:100%; border-collapse:collapse; font-size:13.5px; min-width:460px;}
-  thead th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); padding:10px 12px; border-bottom:1.5px solid var(--ink); white-space:nowrap;}
+  table{width:100%; border-collapse:collapse; font-size:13px; min-width:440px;}
+  thead th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); padding:9px 10px; border-bottom:1.5px solid var(--ink); white-space:nowrap;}
   th.num, td.num{text-align:right;}
-  tbody td{padding:9px 12px; border-bottom:0.5px solid var(--rule-soft); vertical-align:middle;}
+  tbody td{padding:8px 10px; border-bottom:0.5px solid var(--rule-soft); vertical-align:top;}
   tbody tr:last-child td{border-bottom:none;}
 
   tr.subtype-row{cursor:pointer; background:rgba(185,138,61,0.08);}
-  tr.subtype-row td{font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; color:#8A6323;}
-  tr.subtype-row:hover{background:rgba(185,138,61,0.15);}
-
-  tr.category-row td:first-child{padding-left:30px;}
-  tr.category-row.expandable{cursor:pointer;}
-  tr.category-row.expandable:hover{background:rgba(0,0,0,0.025);}
-
-  tr.tx-row td{font-size:12px; color:var(--ink-soft); background:rgba(0,0,0,0.015); font-style:italic;}
-  tr.tx-row td:first-child{padding-left:48px;}
-  tr.tx-row td.num{font-style:normal;}
-
-  tr.total-row td{border-top:2px solid var(--ink); border-bottom:none; font-weight:600; font-size:14.5px;}
-
+  tr.subtype-row td{font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; color:#8A6323;}
+  tr.category-row td:first-child{padding-left:26px;}
   .hidden{display:none;}
-
-  .chevron{font-size:14px; margin-right:6px; color:var(--ink-soft); transition:transform .15s ease; display:inline-block;}
+  .chevron{font-size:13px; margin-right:5px; color:var(--ink-soft); transition:transform .15s ease; display:inline-block;}
   .chevron.open{transform:rotate(90deg);}
 
-  .mini-tag{font-size:10px; font-family:'IBM Plex Mono',monospace; padding:1px 5px; border-radius:3px; margin-left:6px; font-weight:600; background:var(--rule-soft); color:var(--ink-soft);}
-  .mini-tag.ok{background:var(--teal-bg); color:var(--teal);}
-  .mini-tag.warn{background:rgba(185,138,61,0.18); color:#8A6323;}
-  .mini-tag.over{background:var(--rust-bg); color:var(--rust);}
+  .variance{font-size:11px; margin-left:5px;}
+  .variance.over{color:var(--rust);}
+  .variance.ok{color:var(--teal);}
+  .notes-text{font-size:11.5px; color:var(--ink-soft); display:block; margin-top:2px; max-width:220px;}
 
-  .status-text{font-size:12.5px;}
-  .status-text.ok{color:var(--teal);}
-  .status-text.warn{color:#8A6323;}
-  .status-text.over{color:var(--rust);}
-  .status-text.neutral{color:var(--ink-soft);}
-  .notes-text{font-size:12px; color:var(--ink-soft);}
+  tr.total-row td{border-top:2px solid var(--ink); border-bottom:none; font-weight:600; font-size:13.5px;}
 
-  .nw-line{display:flex; align-items:baseline; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
-  .nw-line .nw-num{font-family:'Fraunces',serif; font-weight:500; font-size:26px;}
-  .nw-line .nw-tag{font-size:12px; color:var(--ink-soft);}
-
-  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
-  @media (max-width:640px){ .two-col{grid-template-columns:1fr;} }
-
-  .state-msg{font-size:13px; color:var(--ink-soft); padding:16px 4px; font-style:italic;}
-  footer{margin-top:44px; text-align:center; font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+  .state-msg{font-size:13px; color:var(--ink-soft); padding:14px 4px; font-style:italic;}
+  footer{margin-top:36px; text-align:center; font-size:11.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
 </style>
 </head>
 <body>
@@ -112,7 +97,7 @@
 <div class="masthead">
   <div class="masthead-inner">
     <div>
-      <p class="eyebrow">Household financial ledger</p>
+      <p class="eyebrow">Expense control</p>
       <h1 class="household-name" id="householdName">Loading…</h1>
     </div>
     <span class="stamp" id="mastheadStamp"></span>
@@ -121,56 +106,74 @@
 
 <div class="wrap">
 
-  <!-- 01 Income & Expense -->
-  <div class="section">
-    <div class="section-head">
-      <span class="section-index">01</span>
-      <h2 class="section-title">Income &amp; expense</h2>
-      <span class="section-note">Estimates and actuals, by month</span>
-    </div>
-
+  <div class="section" style="margin-top:20px;">
     <div class="pill-row" id="monthPills"><p class="state-msg">Loading months…</p></div>
-    <div class="kpi-grid" id="kpiGrid"></div>
 
-    <div class="pill-row" id="viewPills"></div>
+    <div id="specialCategoryBanner"></div>
+    <div id="exceptionsBanner"></div>
 
-    <p class="col-label" id="expenseLabel">Expense</p>
-    <div id="expenseBreakdownCard"><p class="state-msg">Loading…</p></div>
+    <div class="card" id="targetCard"><p class="state-msg">Loading…</p></div>
 
-    <p class="col-label" id="incomeLabel" style="margin-top:22px;">Income</p>
-    <div id="incomeBreakdownCard"><p class="state-msg">Loading…</p></div>
-  </div>
-
-  <!-- 02 Assets & Liabilities -->
-  <div class="section">
-    <div class="section-head">
-      <span class="section-index">02</span>
-      <h2 class="section-title">Assets &amp; liabilities</h2>
+    <div class="action-row">
+      <button class="btn secondary" id="btnAddPlanned"><i class="ti ti-plus"></i> Add planned</button>
+      <button class="btn secondary" id="btnLogSpend"><i class="ti ti-plus"></i> Log spend</button>
+      <button class="btn secondary" id="btnCopyMonth"><i class="ti ti-copy"></i> Copy prev. month</button>
     </div>
-    <div class="nw-line">
-      <span class="nw-num num" id="nwValue">—</span>
-      <span class="nw-tag">net worth</span>
-    </div>
-    <div class="two-col">
-      <div>
-        <p class="col-label">Assets</p>
-        <div id="assetsCard"><p class="state-msg">Loading…</p></div>
+
+    <!-- Add Planned form -->
+    <div class="form-panel" id="formAddPlanned">
+      <div class="form-row">
+        <label>Category</label>
+        <select id="fapCategory"></select>
       </div>
-      <div>
-        <p class="col-label">Liabilities</p>
-        <div id="liabCard"><p class="state-msg">Loading…</p></div>
+      <div class="form-row">
+        <label>Estimated amount (₹)</label>
+        <input type="number" id="fapAmount" placeholder="e.g. 14000">
       </div>
+      <div class="form-row">
+        <label>Notes (optional)</label>
+        <input type="text" id="fapNotes" placeholder="e.g. covers half-yearly amount">
+      </div>
+      <div class="form-actions">
+        <button class="btn" id="fapSave">Save</button>
+        <button class="btn secondary" id="fapCancel">Cancel</button>
+      </div>
+      <p class="form-msg" id="fapMsg"></p>
     </div>
-  </div>
 
-  <!-- 03 Insurance -->
-  <div class="section">
-    <div class="section-head">
-      <span class="section-index">03</span>
-      <h2 class="section-title">Insurance</h2>
-      <span class="section-note">Policy register</span>
+    <!-- Log Spend form -->
+    <div class="form-panel" id="formLogSpend">
+      <div class="form-row">
+        <label>Category</label>
+        <select id="flsCategory"></select>
+      </div>
+      <div class="form-row">
+        <label>Amount spent (₹)</label>
+        <input type="number" id="flsAmount" placeholder="e.g. 850">
+      </div>
+      <div class="form-row">
+        <label>Note (optional)</label>
+        <input type="text" id="flsNote" placeholder="e.g. coffee run">
+      </div>
+      <div class="form-actions">
+        <button class="btn" id="flsSave">Add to actual</button>
+        <button class="btn secondary" id="flsCancel">Cancel</button>
+      </div>
+      <p class="form-msg" id="flsMsg"></p>
     </div>
-    <div id="insuranceGroups"><p class="state-msg">Loading…</p></div>
+
+    <!-- Copy Month form -->
+    <div class="form-panel" id="formCopyMonth">
+      <p style="font-size:13px; margin:0 0 10px;">Copy every planned category and amount from the previous month into <span id="copyTargetLabel"></span>. Actual amounts start blank. Existing categories already planned this month are left untouched.</p>
+      <div class="form-actions">
+        <button class="btn" id="fcmSave">Copy now</button>
+        <button class="btn secondary" id="fcmCancel">Cancel</button>
+      </div>
+      <p class="form-msg" id="fcmMsg"></p>
+    </div>
+
+    <p class="col-label">Expenses</p>
+    <div id="expenseTableWrap"><p class="state-msg">Loading…</p></div>
   </div>
 
   <footer>Data from the household Google Sheet, via Apps Script</footer>
@@ -180,12 +183,20 @@
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyogz2z2P1zmfrl7McdjQIRA1I0Dczrvlr_1tpOxDCMK84DrXuaPmBO0TORkOetTtZ0qQ/exec';
 
 const fmt = n => '₹' + Math.round(n || 0).toLocaleString('en-IN');
-const zoneColor = pct => pct < 70 ? 'ok' : pct < 95 ? 'warn' : 'over';
 
-async function api(action, params={}) {
+async function apiGet(action, params={}) {
   const qs = new URLSearchParams({ action, ...params }).toString();
   const res = await fetch(`${APPS_SCRIPT_URL}?${qs}`);
   if (!res.ok) throw new Error('Request failed: ' + action);
+  return res.json();
+}
+// text/plain avoids a CORS preflight against the Apps Script web app
+async function apiPost(body) {
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(body),
+  });
   return res.json();
 }
 
@@ -194,355 +205,281 @@ function monthLabel(key){
   const [y,m] = key.split('-').map(Number);
   return `${MONTH_NAMES[m-1]} ${y}`;
 }
+function prevMonthKey(key){
+  let [y,m] = key.split('-').map(Number);
+  m -= 1; if (m < 1){ m = 12; y -= 1; }
+  return y + '-' + String(m).padStart(2,'0');
+}
 
-/* ============================================================
- * STATE
- * ============================================================ */
 let months = [];
 let currentMonth = '';
 let selectedMonth = '';
-let selectedView = 'actual';
-const cache = {};
+let outflowCategories = [];
 
 /* ============================================================
  * MONTH PILLS
  * ============================================================ */
 function renderMonthPills(){
   document.getElementById('monthPills').innerHTML = months.map(m => `
-    <button class="pill ${m===selectedMonth?'active':''}" data-month="${m}">
-      ${m===currentMonth?'<span class="live-dot"></span>':''}${monthLabel(m)}${m===currentMonth?' · in progress':''}
-    </button>`).join('');
+    <button class="pill ${m===selectedMonth?'active':''}" data-month="${m}">${monthLabel(m)}${m===currentMonth?' · current':''}</button>`).join('');
   document.querySelectorAll('#monthPills .pill').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       selectedMonth = btn.dataset.month;
       document.querySelectorAll('#monthPills .pill').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
-      await loadAndRenderIncomeExpense();
+      closeAllForms();
+      await loadAndRenderExpenses();
     });
   });
 }
 
 /* ============================================================
- * VIEW PILLS (Estimate / Actual)
+ * LOAD + RENDER EXPENSE DATA
  * ============================================================ */
-function renderViewPills(){
-  const views = [{k:'estimated', label:'Estimated'}, {k:'actual', label:'Actual'}];
-  document.getElementById('viewPills').innerHTML = views.map(v => `
-    <button class="pill ghost ${v.k===selectedView?'active':''}" data-view="${v.k}">${v.label}</button>`).join('');
-  document.querySelectorAll('#viewPills .pill').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      selectedView = btn.dataset.view;
-      document.querySelectorAll('#viewPills .pill').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      renderBreakdown(cache[selectedMonth]);
-    });
-  });
+let currentData = null;
+
+async function loadAndRenderExpenses(){
+  document.getElementById('targetCard').innerHTML = `<p class="state-msg">Loading…</p>`;
+  document.getElementById('expenseTableWrap').innerHTML = `<p class="state-msg">Loading…</p>`;
+  try {
+    currentData = await apiGet('expenses', { month: selectedMonth });
+  } catch (err){
+    document.getElementById('expenseTableWrap').innerHTML = `<p class="state-msg">Couldn't load data — check the Apps Script URL and deployment.</p>`;
+    return;
+  }
+  document.getElementById('mastheadStamp').textContent = monthLabel(currentData.month) + (currentData.isCurrent ? ' · in progress' : '');
+  renderSpecialCategoryBanner(currentData.specialCategoryIssues);
+  renderExceptionsBanner(currentData.exceptions);
+  renderTargetCard(currentData);
+  renderExpenseTable(currentData);
 }
 
-/* ============================================================
- * KPI CARDS
- * ============================================================ */
-function renderKpiCards(data){
-  const { estimate } = data;
-  const estIncomeTotal = estimate.income.reduce((s,i)=>s+i.amount,0);
-  const estExpenseTotal = estimate.expense.reduce((s,e)=>s+e.amount,0);
+function renderSpecialCategoryBanner(missing){
+  const el = document.getElementById('specialCategoryBanner');
+  if (!missing || !missing.length){ el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="banner error"><i class="ti ti-alert-circle"></i>
+    <div>Special outflow categories missing from the Categories sheet: <strong>${missing.join(', ')}</strong>. Add them there, or update "Special Outflow Categories" in Config.</div></div>`;
+}
 
-  const actIncomeTotal = data.actual.income.reduce((s,i)=>s+i.amount,0);
-  const catList = expenseCategoryList(data);
-  const actExpenseTotal = catList.reduce((s,c)=>s + spentFor(data,c), 0);
+function renderExceptionsBanner(exceptions){
+  const el = document.getElementById('exceptionsBanner');
+  if (!exceptions || !exceptions.length){ el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="banner warn"><i class="ti ti-alert-triangle"></i>
+    <div>${exceptions.length} exception${exceptions.length>1?'s':''} vs last month's actual:
+      <ul>${exceptions.map(x => `<li>${x.category}: ${fmt(x.prevActual)} last month → ${fmt(x.thisEstimate)} estimated this month</li>`).join('')}</ul>
+    </div></div>`;
+}
 
-  const card = (title, income, expense) => {
-    const diff = income - expense;
-    const zone = diff >= 0 ? 'ok' : 'over';
-    return `
-    <div class="kpi-card">
-      <p class="kpi-head">${title}</p>
-      <div class="kpi-line"><span>Total income</span><span class="val">${fmt(income)}</span></div>
-      <div class="kpi-line"><span>Total expense</span><span class="val">${fmt(expense)}</span></div>
-      <div class="kpi-diff ${zone}">
-        <span class="kpi-diff-label">${diff >= 0 ? 'Surplus' : 'Deficit'}</span>
-        <span class="kpi-diff-val">${fmt(Math.abs(diff))}</span>
+function renderTargetCard(data){
+  const card = document.getElementById('targetCard');
+  const pctOfEst = data.estTotal ? (data.actTotal / data.estTotal * 100) : 0;
+  card.innerHTML = `
+    <div class="card-line"><span>Estimate total</span><span class="val">${fmt(data.estTotal)}</span></div>
+    <div class="card-line"><span>Actual so far</span><span class="val">${fmt(data.actTotal)} <span style="color:var(--ink-soft);">(${pctOfEst.toFixed(0)}%)</span></span></div>
+    <div class="target-row">
+      <span style="font-size:13px;">Target reduction</span>
+      <span>
+        ${data.targetPct !== null ? `<span class="num" style="font-weight:600;">${data.targetPct}%</span>` : `<span style="color:var(--ink-soft); font-size:12.5px;">not set</span>`}
+        <button class="link-btn" id="btnEditTarget" style="margin-left:8px;">edit</button>
+      </span>
+    </div>
+    <div id="targetEditRow" style="display:none; margin-top:8px;">
+      <div class="target-edit">
+        <input type="number" id="targetPctInput" value="${data.targetPct !== null ? data.targetPct : ''}" step="0.5">
+        <span style="font-size:12.5px;">%</span>
+        <button class="btn" id="targetSaveBtn" style="padding:6px 10px;">Save</button>
       </div>
+      <p class="form-msg" id="targetMsg"></p>
     </div>`;
-  };
 
-  document.getElementById('kpiGrid').innerHTML =
-    card('Estimated', estIncomeTotal, estExpenseTotal) +
-    card('Actual' + (data.isCurrent ? ' · so far' : ''), actIncomeTotal, actExpenseTotal);
-
-  document.getElementById('mastheadStamp').textContent = monthLabel(data.month) + (data.isCurrent ? ' · in progress' : '');
-}
-
-function expenseCategoryList(data){
-  const fromEstimate = data.estimate.expense.map(e=>e.label);
-  const fromActual = Object.keys(data.actual.expense);
-  const seen = new Set();
-  const ordered = [];
-  [...fromEstimate, ...fromActual].forEach(c=>{ if(!seen.has(c)){ seen.add(c); ordered.push(c); } });
-  return ordered;
-}
-function spentFor(data, cat){
-  return (data.actual.expense[cat]||[]).reduce((s,t)=>s+t.amount,0);
+  document.getElementById('btnEditTarget').addEventListener('click', ()=>{
+    document.getElementById('targetEditRow').style.display = 'block';
+  });
+  document.getElementById('targetSaveBtn').addEventListener('click', async ()=>{
+    const val = document.getElementById('targetPctInput').value;
+    const msg = document.getElementById('targetMsg');
+    if (val === '' || isNaN(val)){ msg.textContent = 'Enter a number.'; msg.className = 'form-msg error'; return; }
+    msg.textContent = 'Saving…'; msg.className = 'form-msg';
+    try {
+      await apiPost({ action:'setTarget', month: selectedMonth, targetPct: Number(val) });
+      await loadAndRenderExpenses();
+    } catch(err){
+      msg.textContent = 'Could not save.'; msg.className = 'form-msg error';
+    }
+  });
 }
 
 /* ============================================================
- * EXPENSE TABLE — Subtype > Category > Transaction accordion,
- * collapsed by default. % is always % of total expense.
+ * EXPENSE TABLE — Subtype > Category accordion
  * ============================================================ */
 function renderExpenseTable(data){
-  document.getElementById('expenseLabel').textContent = 'Expense — ' + (selectedView === 'estimated' ? 'Estimated' : 'Actual');
-  const card = document.getElementById('expenseBreakdownCard');
-  const { estimate, actual, isCurrent, dayOfMonth, daysInMonth, categoryMeta } = data;
-  const elapsedPct = daysInMonth ? dayOfMonth/daysInMonth*100 : 0;
-  const catList = expenseCategoryList(data);
-
-  if (!catList.length){
-    card.innerHTML = `<p class="state-msg">No expense data for this month yet</p>`;
+  const wrap = document.getElementById('expenseTableWrap');
+  if (!data.categories.length){
+    wrap.innerHTML = `<p class="state-msg">No expenses planned for this month yet — use "Add planned" above.</p>`;
     return;
   }
 
-  const amountFor = c => selectedView === 'estimated'
-    ? ((estimate.expense.find(x=>x.label===c)||{}).amount || 0)
-    : spentFor(data, c);
-
   const subtypeOrder = [];
   const groups = {};
-  catList.forEach(c=>{
-    const st = (categoryMeta[c] && categoryMeta[c].subtype) || 'Other';
+  data.categories.forEach(c => {
+    const st = c.subtype || 'Other';
     if (!groups[st]){ groups[st] = []; subtypeOrder.push(st); }
     groups[st].push(c);
   });
 
-  const subtypeData = subtypeOrder.map(st => {
-    const cats = groups[st].slice().sort((a,b) => amountFor(b) - amountFor(a));
-    const subtotal = cats.reduce((s,c)=>s+amountFor(c),0);
-    return { st, cats, subtotal };
-  });
-  const grandTotal = subtypeData.reduce((s,g)=>s+g.subtotal,0);
-
-  const headerCells = selectedView === 'estimated'
-    ? '<th>Category</th><th class="num">Amount</th><th class="num">% of total</th><th>Notes</th>'
-    : '<th>Category</th><th class="num">Amount</th><th class="num">% of total</th><th>Status</th>';
+  const grandEstTotal = data.estTotal;
+  const grandActTotal = data.actTotal;
 
   let bodyRows = '';
-  subtypeData.forEach((g, i) => {
-    const stPct = grandTotal ? g.subtotal/grandTotal*100 : 0;
+  subtypeOrder.forEach((st, i) => {
+    const cats = groups[st].slice().sort((a,b) => b.actualAmount - a.actualAmount);
+    const stEst = cats.reduce((s,c)=>s+c.estAmount,0);
+    const stAct = cats.reduce((s,c)=>s+c.actualAmount,0);
+    const stPct = grandActTotal ? (stAct/grandActTotal*100) : 0;
+
     bodyRows += `
       <tr class="subtype-row" id="st-${i}">
-        <td><i class="ti ti-chevron-right chevron"></i>${g.st}</td>
-        <td class="num">${fmt(g.subtotal)}</td>
+        <td><i class="ti ti-chevron-right chevron"></i>${st}</td>
+        <td class="num">${fmt(stEst)}</td>
+        <td class="num">${fmt(stAct)}</td>
         <td class="num">${stPct.toFixed(0)}%</td>
-        <td></td>
       </tr>`;
 
-    g.cats.forEach((c, j) => {
-      const amount = amountFor(c);
-      const pctOfTotal = grandTotal ? amount/grandTotal*100 : 0;
-
-      if (selectedView === 'estimated'){
-        const e = estimate.expense.find(x=>x.label===c);
-        bodyRows += `
-          <tr class="category-row hidden cat-under-st-${i}" id="cat-${i}-${j}">
-            <td>${c}</td>
-            <td class="num">${fmt(amount)}</td>
-            <td class="num">${pctOfTotal.toFixed(0)}%</td>
-            <td class="notes-text">${e && e.notes ? e.notes : ''}</td>
-          </tr>`;
-        return;
-      }
-
-      const budgetEntry = estimate.expense.find(e=>e.label===c);
-      const budget = budgetEntry ? budgetEntry.amount : 0;
-      const txs = actual.expense[c] || [];
-      const pct = budget ? (amount/budget*100) : 0;
-      const usedZone = zoneColor(pct);
-      const discretionary = categoryMeta[c] ? categoryMeta[c].discretionary : false;
-
-      let statusText, statusZone;
-      if (isCurrent){
-        if (discretionary){
-          const remaining = budget - amount;
-          const gap = pct - elapsedPct;
-          const pace = gap > 15 ? 'ahead of pace' : gap < -15 ? 'under pace' : 'on pace';
-          statusZone = remaining < 0 ? 'over' : (gap > 15 ? 'over' : gap < -15 ? 'ok' : 'warn');
-          statusText = remaining >= 0 ? `${fmt(remaining)} left · ${pace}` : `${fmt(-remaining)} over · ${pace}`;
-        } else {
-          statusZone = 'neutral';
-          statusText = amount > 0 ? `Paid ${txs[0] ? txs[0].date : ''}` : 'Not due';
-        }
-      } else {
-        const diff = amount - budget;
-        statusZone = diff > 0 ? 'over' : diff < 0 ? 'ok' : 'neutral';
-        statusText = diff > 0 ? `${fmt(diff)} over` : diff < 0 ? `${fmt(-diff)} under` : 'On estimate';
-      }
-
-      const budgetTag = budget ? `<span class="mini-tag ${usedZone}">${pct.toFixed(0)}%</span>` : '';
+    cats.forEach((c, j) => {
+      const pctOfTotal = grandActTotal ? (c.actualAmount/grandActTotal*100) : 0;
+      const diff = c.actualAmount - c.estAmount;
+      const varianceHtml = c.estAmount
+        ? `<span class="variance ${diff>0?'over':'ok'}">${diff>0?'+':''}${fmt(diff)}</span>`
+        : '';
       bodyRows += `
-        <tr class="category-row expandable hidden cat-under-st-${i}" id="cat-${i}-${j}">
-          <td><i class="ti ti-chevron-right chevron"></i>${c}</td>
-          <td class="num">${fmt(amount)}${budgetTag}</td>
+        <tr class="category-row hidden cat-under-st-${i}" id="cat-${i}-${j}">
+          <td>${c.category}${c.notes ? `<span class="notes-text">${c.notes}</span>` : ''}</td>
+          <td class="num">${fmt(c.estAmount)}</td>
+          <td class="num">${fmt(c.actualAmount)}${varianceHtml}</td>
           <td class="num">${pctOfTotal.toFixed(0)}%</td>
-          <td><span class="status-text ${statusZone}">${statusText}</span></td>
         </tr>`;
-
-      if (txs.length){
-        txs.forEach(t => {
-          bodyRows += `
-            <tr class="tx-row hidden tx-under-cat-${i}-${j}">
-              <td colspan="3">${t.date}${t.note ? ' · '+t.note : ''}</td>
-              <td class="num">${fmt(t.amount)}</td>
-            </tr>`;
-        });
-      } else {
-        bodyRows += `<tr class="tx-row hidden tx-under-cat-${i}-${j}"><td colspan="4">No transactions logged</td></tr>`;
-      }
     });
   });
 
   bodyRows += `
     <tr class="total-row">
-      <td>Total expense</td><td class="num">${fmt(grandTotal)}</td><td class="num">100%</td><td></td>
+      <td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td class="num">${fmt(grandActTotal)}</td><td class="num">100%</td>
     </tr>`;
 
-  card.innerHTML = `<div class="table-scroll"><table><thead><tr>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>`;
+  wrap.innerHTML = `<div class="table-scroll"><table>
+    <thead><tr><th>Category</th><th class="num">Est</th><th class="num">Actual</th><th class="num">% of total</th></tr></thead>
+    <tbody>${bodyRows}</tbody>
+  </table></div>`;
 
-  subtypeData.forEach((g, i) => {
+  subtypeOrder.forEach((st, i) => {
     const stRow = document.getElementById(`st-${i}`);
     stRow.addEventListener('click', () => {
       const chevron = stRow.querySelector('.chevron');
       const willOpen = !chevron.classList.contains('open');
       chevron.classList.toggle('open', willOpen);
-      g.cats.forEach((c, j) => {
-        const catRow = document.getElementById(`cat-${i}-${j}`);
-        catRow.classList.toggle('hidden', !willOpen);
-        if (!willOpen){
-          const catChevron = catRow.querySelector('.chevron');
-          if (catChevron) catChevron.classList.remove('open');
-          document.querySelectorAll(`.tx-under-cat-${i}-${j}`).forEach(tx => tx.classList.add('hidden'));
-        }
-      });
+      document.querySelectorAll(`.cat-under-st-${i}`).forEach(row => row.classList.toggle('hidden', !willOpen));
     });
   });
-
-  if (selectedView === 'actual'){
-    subtypeData.forEach((g, i) => {
-      g.cats.forEach((c, j) => {
-        const catRow = document.getElementById(`cat-${i}-${j}`);
-        catRow.addEventListener('click', () => {
-          const chevron = catRow.querySelector('.chevron');
-          const willOpen = !chevron.classList.contains('open');
-          chevron.classList.toggle('open', willOpen);
-          document.querySelectorAll(`.tx-under-cat-${i}-${j}`).forEach(row => row.classList.toggle('hidden', !willOpen));
-        });
-      });
-    });
-  }
 }
 
 /* ============================================================
- * INCOME TABLE — flat, no accordion, no % column
+ * ADD PLANNED / LOG SPEND / COPY MONTH — forms
  * ============================================================ */
-function renderIncomeTable(data){
-  document.getElementById('incomeLabel').textContent = 'Income — ' + (selectedView === 'estimated' ? 'Estimated' : 'Actual');
-  const card = document.getElementById('incomeBreakdownCard');
-  const list = selectedView === 'estimated' ? data.estimate.income : data.actual.income;
-
-  if (!list.length){
-    card.innerHTML = `<p class="state-msg">No income data for this month yet</p>`;
-    return;
-  }
-  const total = list.reduce((s,i)=>s+i.amount,0);
-  const rows = list.map(i => `
-    <tr><td>${i.label}</td><td class="num">${fmt(i.amount)}</td><td class="notes-text">${i.notes||''}</td></tr>`).join('');
-  card.innerHTML = `<div class="table-scroll"><table>
-    <thead><tr><th>Source</th><th class="num">Amount</th><th>Notes</th></tr></thead>
-    <tbody>${rows}<tr class="total-row"><td>Total income</td><td class="num">${fmt(total)}</td><td></td></tr></tbody>
-  </table></div>`;
+function closeAllForms(){
+  ['formAddPlanned','formLogSpend','formCopyMonth'].forEach(id => document.getElementById(id).classList.remove('open'));
 }
 
-function renderBreakdown(data){
-  if (!data) return;
-  renderExpenseTable(data);
-  renderIncomeTable(data);
+async function ensureCategoryOptions(){
+  if (outflowCategories.length) return;
+  try { outflowCategories = await apiGet('categories'); } catch(err){ outflowCategories = []; }
 }
 
-/* ============================================================
- * LOAD + RENDER: INCOME/EXPENSE
- * ============================================================ */
-async function loadAndRenderIncomeExpense(){
-  document.getElementById('expenseBreakdownCard').innerHTML = `<p class="state-msg">Loading…</p>`;
-  document.getElementById('incomeBreakdownCard').innerHTML = `<p class="state-msg">Loading…</p>`;
-  if (!cache[selectedMonth]){
-    try {
-      cache[selectedMonth] = await api('incomeExpense', { month: selectedMonth });
-    } catch (err){
-      document.getElementById('expenseBreakdownCard').innerHTML = `<p class="state-msg">Couldn't load data — check the Apps Script URL and deployment.</p>`;
-      return;
-    }
-  }
-  const data = cache[selectedMonth];
-  renderKpiCards(data);
-  renderBreakdown(data);
+function populateCategorySelect(selectEl){
+  selectEl.innerHTML = outflowCategories.map(c => `<option value="${c.category}">${c.category} (${c.subtype})</option>`).join('');
 }
 
-/* ============================================================
- * ASSETS & LIABILITIES — plain tables, no % column
- * ============================================================ */
-async function loadAndRenderAssetsLiabilities(){
+document.getElementById('btnAddPlanned').addEventListener('click', async ()=>{
+  closeAllForms();
+  await ensureCategoryOptions();
+  populateCategorySelect(document.getElementById('fapCategory'));
+  document.getElementById('fapAmount').value = '';
+  document.getElementById('fapNotes').value = '';
+  document.getElementById('fapMsg').textContent = '';
+  document.getElementById('formAddPlanned').classList.add('open');
+});
+document.getElementById('fapCancel').addEventListener('click', closeAllForms);
+document.getElementById('fapSave').addEventListener('click', async ()=>{
+  const category = document.getElementById('fapCategory').value;
+  const amount = document.getElementById('fapAmount').value;
+  const notes = document.getElementById('fapNotes').value;
+  const msg = document.getElementById('fapMsg');
+  if (!category){ msg.textContent = 'Choose a category.'; msg.className = 'form-msg error'; return; }
+  if (amount === '' || isNaN(amount) || Number(amount) < 0){ msg.textContent = 'Enter a valid amount.'; msg.className = 'form-msg error'; return; }
+  msg.textContent = 'Saving…'; msg.className = 'form-msg';
   try {
-    const { assets, liabilities } = await api('assetsLiabilities');
-    const buildTable = (items, totalLabel) => {
-      if (!items.length) return `<p class="state-msg">No entries yet</p>`;
-      const total = items.reduce((s,x)=>s+x.amount,0);
-      const rows = items.map(x => `
-        <tr><td>${x.label}</td><td class="num">${fmt(x.amount)}</td><td class="notes-text">${x.notes||''}</td></tr>`).join('');
-      return `<div class="table-scroll"><table>
-        <thead><tr><th>Label</th><th class="num">Amount</th><th>Notes</th></tr></thead>
-        <tbody>${rows}<tr class="total-row"><td>${totalLabel}</td><td class="num">${fmt(total)}</td><td></td></tr></tbody>
-      </table></div>`;
-    };
-    document.getElementById('assetsCard').innerHTML = buildTable(assets, 'Total assets');
-    document.getElementById('liabCard').innerHTML = buildTable(liabilities, 'Total liabilities');
-    const totalAssets = assets.reduce((s,a)=>s+a.amount,0);
-    const totalLiab = liabilities.reduce((s,l)=>s+l.amount,0);
-    document.getElementById('nwValue').textContent = fmt(totalAssets - totalLiab);
-  } catch (err){
-    document.getElementById('assetsCard').innerHTML = `<p class="state-msg">Couldn't load data</p>`;
-    document.getElementById('liabCard').innerHTML = `<p class="state-msg">Couldn't load data</p>`;
+    await apiPost({ action:'addPlanned', month: selectedMonth, category, estAmount: Number(amount), notes });
+    msg.textContent = 'Saved.'; msg.className = 'form-msg ok';
+    await loadAndRenderExpenses();
+    setTimeout(closeAllForms, 600);
+  } catch(err){
+    msg.textContent = 'Could not save.'; msg.className = 'form-msg error';
   }
-}
+});
 
-/* ============================================================
- * INSURANCE — single flat table
- * ============================================================ */
-async function loadAndRenderInsurance(){
+document.getElementById('btnLogSpend').addEventListener('click', async ()=>{
+  closeAllForms();
+  await ensureCategoryOptions();
+  populateCategorySelect(document.getElementById('flsCategory'));
+  document.getElementById('flsAmount').value = '';
+  document.getElementById('flsNote').value = '';
+  document.getElementById('flsMsg').textContent = '';
+  document.getElementById('formLogSpend').classList.add('open');
+});
+document.getElementById('flsCancel').addEventListener('click', closeAllForms);
+document.getElementById('flsSave').addEventListener('click', async ()=>{
+  const category = document.getElementById('flsCategory').value;
+  const amount = document.getElementById('flsAmount').value;
+  const note = document.getElementById('flsNote').value;
+  const msg = document.getElementById('flsMsg');
+  if (!category){ msg.textContent = 'Choose a category.'; msg.className = 'form-msg error'; return; }
+  if (amount === '' || isNaN(amount) || Number(amount) <= 0){ msg.textContent = 'Enter a valid amount.'; msg.className = 'form-msg error'; return; }
+  msg.textContent = 'Saving…'; msg.className = 'form-msg';
   try {
-    const groups = await api('insurance');
-    const card = document.getElementById('insuranceGroups');
-    if (!groups.length){ card.innerHTML = `<p class="state-msg">No policies entered yet</p>`; return; }
-    const rows = [];
-    groups.forEach(g => g.items.forEach(it => {
-      rows.push(`<tr>
-        <td>${g.group}</td><td>${it.holder}</td><td>${it.company||''}</td>
-        <td class="num">${fmt(it.sumInsured)}</td><td class="num">${fmt(it.premium)}${it.freq||''}</td>
-        <td>${it.renewal||'—'}</td><td class="notes-text">${it.notes||''}</td>
-      </tr>`);
-    }));
-    card.innerHTML = `<div class="table-scroll"><table>
-      <thead><tr><th>Group</th><th>Holder</th><th>Company</th><th class="num">Sum insured</th><th class="num">Premium</th><th>Renewal</th><th>Notes</th></tr></thead>
-      <tbody>${rows.join('')}</tbody>
-    </table></div>`;
-  } catch (err){
-    document.getElementById('insuranceGroups').innerHTML = `<p class="state-msg">Couldn't load data</p>`;
+    await apiPost({ action:'logSpend', month: selectedMonth, category, amount: Number(amount), note });
+    msg.textContent = 'Added.'; msg.className = 'form-msg ok';
+    await loadAndRenderExpenses();
+    setTimeout(closeAllForms, 600);
+  } catch(err){
+    msg.textContent = 'Could not save.'; msg.className = 'form-msg error';
   }
-}
+});
+
+document.getElementById('btnCopyMonth').addEventListener('click', ()=>{
+  closeAllForms();
+  document.getElementById('copyTargetLabel').textContent = monthLabel(selectedMonth);
+  document.getElementById('fcmMsg').textContent = '';
+  document.getElementById('formCopyMonth').classList.add('open');
+});
+document.getElementById('fcmCancel').addEventListener('click', closeAllForms);
+document.getElementById('fcmSave').addEventListener('click', async ()=>{
+  const msg = document.getElementById('fcmMsg');
+  msg.textContent = 'Copying…'; msg.className = 'form-msg';
+  try {
+    const res = await apiPost({ action:'copyMonth', fromMonth: prevMonthKey(selectedMonth), toMonth: selectedMonth });
+    msg.textContent = `Copied ${res.copied} categor${res.copied===1?'y':'ies'}.`; msg.className = 'form-msg ok';
+    await loadAndRenderExpenses();
+    setTimeout(closeAllForms, 900);
+  } catch(err){
+    msg.textContent = 'Could not copy.'; msg.className = 'form-msg error';
+  }
+});
 
 /* ============================================================
  * META
  * ============================================================ */
 async function loadMeta(){
   try {
-    const { householdName } = await api('meta');
+    const { householdName } = await apiGet('meta');
     document.getElementById('householdName').textContent = householdName;
   } catch (err){
     document.getElementById('householdName').textContent = 'Household Ledger';
@@ -554,11 +491,8 @@ async function loadMeta(){
  * ============================================================ */
 (async function init(){
   loadMeta();
-  loadAndRenderAssetsLiabilities();
-  loadAndRenderInsurance();
-
   try {
-    const res = await api('months');
+    const res = await apiGet('months');
     months = res.months;
     currentMonth = res.currentMonth;
     selectedMonth = currentMonth;
@@ -566,10 +500,8 @@ async function loadMeta(){
     document.getElementById('monthPills').innerHTML = `<p class="state-msg">Couldn't load month range — check the Apps Script URL and deployment.</p>`;
     return;
   }
-
   renderMonthPills();
-  renderViewPills();
-  loadAndRenderIncomeExpense();
+  loadAndRenderExpenses();
 })();
 </script>
 </body>
