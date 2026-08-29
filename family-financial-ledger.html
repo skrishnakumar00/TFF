@@ -122,7 +122,6 @@
   <div class="section" style="margin-top:20px;">
     <div class="pill-row" id="monthPills"><p class="state-msg">Loading months…</p></div>
 
-    <div id="specialCategoryBanner"></div>
     <div id="exceptionsBanner"></div>
 
     <div class="card" id="targetCard"><p class="state-msg">Loading…</p></div>
@@ -261,19 +260,11 @@ async function loadAndRenderExpenses(){
     return;
   }
   document.getElementById('mastheadStamp').textContent = monthLabel(currentData.month) + (currentData.isCurrent ? ' · in progress' : '');
-  renderSpecialCategoryBanner(currentData.specialCategoryIssues);
   // Exceptions banner hidden for now — data still computed server-side (currentData.exceptions),
   // just not rendered. Uncomment to bring back: renderExceptionsBanner(currentData.exceptions);
   document.getElementById('exceptionsBanner').innerHTML = '';
   renderTargetCard(currentData);
   renderExpenseTable(currentData);
-}
-
-function renderSpecialCategoryBanner(missing){
-  const el = document.getElementById('specialCategoryBanner');
-  if (!missing || !missing.length){ el.innerHTML = ''; return; }
-  el.innerHTML = `<div class="banner error"><i class="ti ti-alert-circle"></i>
-    <div>Special outflow categories missing from the Categories sheet: <strong>${missing.join(', ')}</strong>. Add them there, or update "Special Outflow Categories" in Config.</div></div>`;
 }
 
 function renderExceptionsBanner(exceptions){
@@ -370,6 +361,9 @@ function renderExpenseTable(data){
     if (!groups[st]){ groups[st] = []; subtypeOrder.push(st); }
     groups[st].push(c);
   });
+  // Watch is a focus group, always shown last regardless of sheet order
+  const watchIdx = subtypeOrder.indexOf('Watch');
+  if (watchIdx > -1) subtypeOrder.push(subtypeOrder.splice(watchIdx, 1)[0]);
 
   const grandEstTotal = data.estTotal;
 
