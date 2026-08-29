@@ -32,6 +32,13 @@
   .section{margin-top:28px;}
   .col-label{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px 2px;}
 
+  .sync-row{display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;}
+  .sync-time{font-size:11.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+  .refresh-btn{display:flex; align-items:center; gap:5px; background:none; border:1px solid var(--rule); color:var(--ink); font-family:'IBM Plex Mono',monospace; font-size:12px; padding:5px 11px; border-radius:16px; cursor:pointer;}
+  .refresh-btn:disabled{opacity:0.5; cursor:default;}
+  .refresh-btn i{font-size:13px; transition:transform .5s ease;}
+  .refresh-btn.spinning i{animation:spin 0.7s linear infinite;}
+  @keyframes spin{ to{ transform:rotate(360deg); } }
   .pill-row{display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; overflow-x:auto;}
   .pill{font-family:'IBM Plex Mono', monospace; font-size:12.5px; background:none; border:1px solid var(--rule); color:var(--ink-soft); padding:7px 14px; border-radius:20px; cursor:pointer; white-space:nowrap;}
   .pill.active{background:var(--ledger); border-color:var(--ledger); color:#FBFAF4;}
@@ -120,6 +127,10 @@
 <div class="wrap">
 
   <div class="section" style="margin-top:20px;">
+    <div class="sync-row">
+      <button class="refresh-btn" id="refreshBtn"><i class="ti ti-refresh"></i> Refresh</button>
+      <span class="sync-time" id="syncTime"></span>
+    </div>
     <div class="pill-row" id="monthPills"><p class="state-msg">Loading months…</p></div>
 
     <div id="exceptionsBanner"></div>
@@ -250,6 +261,14 @@ function renderMonthPills(){
  * ============================================================ */
 let currentData = null;
 
+function updateSyncTime(){
+  const now = new Date();
+  const h = now.getHours() % 12 || 12;
+  const min = String(now.getMinutes()).padStart(2,'0');
+  const ampm = now.getHours() < 12 ? 'AM' : 'PM';
+  document.getElementById('syncTime').textContent = `Synced ${h}:${min} ${ampm}`;
+}
+
 async function loadAndRenderExpenses(){
   document.getElementById('targetCard').innerHTML = `<p class="state-msg">Loading…</p>`;
   document.getElementById('expenseTableWrap').innerHTML = `<p class="state-msg">Loading…</p>`;
@@ -259,13 +278,31 @@ async function loadAndRenderExpenses(){
     document.getElementById('expenseTableWrap').innerHTML = `<p class="state-msg">Couldn't load data — check the Apps Script URL and deployment.</p>`;
     return;
   }
+  updateSyncTime();
   document.getElementById('mastheadStamp').textContent = monthLabel(currentData.month) + (currentData.isCurrent ? ' · in progress' : '');
-  // Exceptions banner hidden for now — data still computed server-side (currentData.exceptions),
-  // just not rendered. Uncomment to bring back: renderExceptionsBanner(currentData.exceptions);
   document.getElementById('exceptionsBanner').innerHTML = '';
   renderTargetCard(currentData);
   renderExpenseTable(currentData);
 }
+
+document.getElementById('refreshBtn').addEventListener('click', async ()=>{
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.classList.add('spinning');
+  outflowCategories = []; // force categories dropdown to refetch next time a form opens
+  try {
+    const res = await apiGet('months');
+    months = res.months;
+    currentMonth = res.currentMonth;
+    if (!months.includes(selectedMonth)) selectedMonth = currentMonth;
+    renderMonthPills();
+    await loadAndRenderExpenses();
+  } catch (err){
+    // leave existing view as-is if refresh fails
+  }
+  btn.disabled = false;
+  btn.classList.remove('spinning');
+});
 
 function renderExceptionsBanner(exceptions){
   const el = document.getElementById('exceptionsBanner');
