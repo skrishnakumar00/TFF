@@ -54,7 +54,8 @@
   .progress-track{position:relative; height:20px; border-radius:6px; background:var(--rule-soft); margin-top:20px;}
   .progress-fill{position:absolute; top:0; left:0; height:100%; border-radius:6px; transition:width .3s ease;}
   .progress-marker{position:absolute; top:-3px; height:26px; width:0; border-left-width:2px; border-left-style:solid; border-color:var(--ink-soft);}
-  .progress-marker.target{border-left-style:dashed; border-color:var(--ledger);}
+  .progress-marker.target{border-left-style:dashed; border-left-width:2px; border-color:var(--ledger);}
+  .progress-marker.plan{border-left-width:3px; border-color:var(--ink);}
   .progress-marker-label{position:absolute; top:-17px; font-size:10px; font-family:'IBM Plex Mono',monospace; white-space:nowrap; transform:translateX(-50%); color:var(--ink-soft);}
   .progress-marker-label.target{color:var(--ledger); font-weight:600;}
   .progress-caption{margin-top:8px; font-size:13px; font-weight:600;}
@@ -261,7 +262,9 @@ async function loadAndRenderExpenses(){
   }
   document.getElementById('mastheadStamp').textContent = monthLabel(currentData.month) + (currentData.isCurrent ? ' · in progress' : '');
   renderSpecialCategoryBanner(currentData.specialCategoryIssues);
-  renderExceptionsBanner(currentData.exceptions);
+  // Exceptions banner hidden for now — data still computed server-side (currentData.exceptions),
+  // just not rendered. Uncomment to bring back: renderExceptionsBanner(currentData.exceptions);
+  document.getElementById('exceptionsBanner').innerHTML = '';
   renderTargetCard(currentData);
   renderExpenseTable(currentData);
 }
@@ -308,7 +311,7 @@ function renderTargetCard(data){
 
   card.innerHTML = `
     <div class="card-line"><span>Estimate total</span><span class="val">${fmt(estTotal)}</span></div>
-    <div class="card-line"><span>Actual so far</span><span class="val">${fmt(actTotal)} <span style="color:var(--ink-soft);">(${pctOfEst.toFixed(0)}%)</span></span></div>
+    <div class="card-line"><span>Actual so far</span><span class="val">${fmt(actTotal)}</span></div>
     <div class="target-row">
       <span style="font-size:13px;">Target reduction</span>
       <span>
@@ -327,11 +330,8 @@ function renderTargetCard(data){
     <div class="progress-wrap">
       <div class="progress-track">
         <div class="progress-fill" style="width:${fillPos}%; background:${zoneColorMap[zone]};"></div>
-        ${targetPos !== null ? `
-          <div class="progress-marker target" style="left:${targetPos}%;"></div>
-          <div class="progress-marker-label target" style="left:${targetPos}%;">Target</div>` : ''}
+        ${targetPos !== null ? `<div class="progress-marker target" style="left:${targetPos}%;"></div>` : ''}
         <div class="progress-marker plan" style="left:${planPos}%;"></div>
-        <div class="progress-marker-label" style="left:${planPos}%;">Plan</div>
       </div>
       <p class="progress-caption ${zone}">${captionText}</p>
     </div>`;
@@ -379,28 +379,26 @@ function renderExpenseTable(data){
     const stEst = cats.reduce((s,c)=>s+c.estAmount,0);
     const stAct = cats.reduce((s,c)=>s+c.actualAmount,0);
     const stPct = grandEstTotal ? (stEst/grandEstTotal*100) : 0;
+    const stDiff = stEst - stAct;
 
     bodyRows += `
       <tr class="subtype-row" id="st-${i}">
         <td><i class="ti ti-chevron-right chevron"></i>${st}</td>
-        <td class="num">${fmt(stEst)}</td>
+        <td class="num">${fmt(stEst)} <span style="font-weight:400; opacity:0.75;">(${stPct.toFixed(0)}%)</span></td>
         <td class="num">${fmt(stAct)}</td>
-        <td class="num">${stPct.toFixed(0)}%</td>
+        <td class="num" style="color:${stDiff<0?'var(--rust)':'inherit'};">${fmt(stDiff)}</td>
         <td></td>
       </tr>`;
 
     cats.forEach((c, j) => {
       const pctOfTotal = grandEstTotal ? (c.estAmount/grandEstTotal*100) : 0;
-      const diff = c.actualAmount - c.estAmount;
-      const varianceHtml = c.estAmount
-        ? `<span class="variance ${diff>0?'over':'ok'}">${diff>0?'+':''}${fmt(diff)}</span>`
-        : '';
+      const diff = c.estAmount - c.actualAmount;
       bodyRows += `
         <tr class="category-row hidden cat-under-st-${i}" id="cat-${i}-${j}">
           <td>${c.category}</td>
-          <td class="num">${fmt(c.estAmount)}</td>
-          <td class="num">${fmt(c.actualAmount)}${varianceHtml}</td>
-          <td class="num">${pctOfTotal.toFixed(0)}%</td>
+          <td class="num">${fmt(c.estAmount)} <span style="color:var(--ink-soft);">(${pctOfTotal.toFixed(0)}%)</span></td>
+          <td class="num">${fmt(c.actualAmount)}</td>
+          <td class="num" style="color:${diff<0?'var(--rust)':'var(--teal)'};">${fmt(diff)}</td>
           <td class="notes-text-cell">${c.notes || ''}</td>
         </tr>`;
     });
@@ -408,11 +406,11 @@ function renderExpenseTable(data){
 
   bodyRows += `
     <tr class="total-row">
-      <td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td class="num">${fmt(data.actTotal)}</td><td class="num">100%</td><td></td>
+      <td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td class="num">${fmt(data.actTotal)}</td><td class="num">${fmt(grandEstTotal - data.actTotal)}</td><td></td>
     </tr>`;
 
   wrap.innerHTML = `<div class="table-scroll"><table>
-    <thead><tr><th>Category</th><th class="num">Est</th><th class="num">Actual</th><th class="num">% of total</th><th>Notes</th></tr></thead>
+    <thead><tr><th>Category</th><th class="num">Est</th><th class="num">Actual</th><th class="num">Difference</th><th>Notes</th></tr></thead>
     <tbody>${bodyRows}</tbody>
   </table></div>`;
 
