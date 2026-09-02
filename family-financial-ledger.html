@@ -135,8 +135,13 @@
 
     <div id="exceptionsBanner"></div>
 
+    <p class="col-label">Net position</p>
+    <div class="card" id="netPositionCard"><p class="state-msg">Loading…</p></div>
+
+    <p class="col-label" style="margin-top:6px;">Income &amp; Expenses</p>
     <div class="card" id="targetCard"><p class="state-msg">Loading…</p></div>
 
+    <p class="col-label" style="margin-top:16px;">Expense categories</p>
     <div class="action-row">
       <button class="btn secondary" id="btnAddPlanned"><i class="ti ti-plus"></i> Add planned</button>
       <button class="btn secondary" id="btnLogSpend"><i class="ti ti-plus"></i> Log spend</button>
@@ -187,7 +192,7 @@
 
     <!-- Copy Month form -->
     <div class="form-panel" id="formCopyMonth">
-      <p style="font-size:13px; margin:0 0 10px;">Copy every planned category and amount from the previous month into <span id="copyTargetLabel"></span>. Actual amounts start blank. Existing categories already planned this month are left untouched.</p>
+      <p style="font-size:13px; margin:0 0 10px;">Copy every planned category (income and expense) and amount from the previous month into <span id="copyTargetLabel"></span>. Actual amounts start blank. Categories already planned this month are left untouched.</p>
       <div class="form-actions">
         <button class="btn" id="fcmSave">Copy now</button>
         <button class="btn secondary" id="fcmCancel">Cancel</button>
@@ -195,8 +200,38 @@
       <p class="form-msg" id="fcmMsg"></p>
     </div>
 
-    <p class="col-label">Expenses</p>
     <div id="expenseTableWrap"><p class="state-msg">Loading…</p></div>
+
+    <p class="col-label" style="margin-top:22px;">Income categories</p>
+    <div class="action-row">
+      <button class="btn secondary" id="btnAddPlannedIncome"><i class="ti ti-plus"></i> Add planned income</button>
+    </div>
+
+    <div class="form-panel" id="formAddPlannedIncome">
+      <div class="form-row">
+        <label>Category</label>
+        <select id="fapiCategory"></select>
+      </div>
+      <div class="form-row">
+        <label>Estimated amount (₹)</label>
+        <input type="number" id="fapiEstAmount" placeholder="e.g. 152000">
+      </div>
+      <div class="form-row">
+        <label>Actual amount (optional, ₹)</label>
+        <input type="number" id="fapiActualAmount" placeholder="leave blank if not yet received">
+      </div>
+      <div class="form-row">
+        <label>Notes (optional)</label>
+        <input type="text" id="fapiNotes" placeholder="e.g. includes annual bonus">
+      </div>
+      <div class="form-actions">
+        <button class="btn" id="fapiSave">Save</button>
+        <button class="btn secondary" id="fapiCancel">Cancel</button>
+      </div>
+      <p class="form-msg" id="fapiMsg"></p>
+    </div>
+
+    <div id="incomeTableWrap"><p class="state-msg">Loading…</p></div>
   </div>
 
   <footer>Data from the household Google Sheet, via Apps Script</footer>
@@ -237,7 +272,7 @@ function prevMonthKey(key){
 let months = [];
 let currentMonth = '';
 let selectedMonth = '';
-let outflowCategories = [];
+let allCategories = [];
 
 /* ============================================================
  * MONTH PILLS
@@ -281,15 +316,27 @@ async function loadAndRenderExpenses(){
   updateSyncTime();
   document.getElementById('mastheadStamp').textContent = monthLabel(currentData.month) + (currentData.isCurrent ? ' · in progress' : '');
   document.getElementById('exceptionsBanner').innerHTML = '';
+  renderNetPositionCard(currentData);
   renderTargetCard(currentData);
   renderExpenseTable(currentData);
+  renderIncomeTable(currentData);
+}
+
+function renderNetPositionCard(data){
+  const card = document.getElementById('netPositionCard');
+  const plannedNet = data.incEstTotal - data.estTotal;
+  const liveNet = data.incEstTotal - data.actTotal;
+  const colorFor = v => v < 0 ? 'color:var(--rust);' : '';
+  card.innerHTML = `
+    <div class="card-line"><span>Planned net position</span><span class="val" style="${colorFor(plannedNet)}">${fmt(plannedNet)}</span></div>
+    <div class="card-line"><span>Live net position</span><span class="val" style="${colorFor(liveNet)}">${fmt(liveNet)}</span></div>`;
 }
 
 document.getElementById('refreshBtn').addEventListener('click', async ()=>{
   const btn = document.getElementById('refreshBtn');
   btn.disabled = true;
   btn.classList.add('spinning');
-  outflowCategories = []; // force categories dropdown to refetch next time a form opens
+  allCategories = []; // force categories dropdown to refetch next time a form opens
   try {
     const res = await apiGet('months');
     months = res.months;
@@ -338,8 +385,9 @@ function renderTargetCard(data){
   const zoneColorMap = { ok: 'var(--teal)', warn: 'var(--gold)', over: 'var(--rust)' };
 
   card.innerHTML = `
-    <div class="card-line"><span>Estimate total</span><span class="val">${fmt(estTotal)}</span></div>
-    <div class="card-line"><span>Actual so far</span><span class="val">${fmt(actTotal)}</span></div>
+    <div class="card-line"><span>Income — estimate</span><span class="val">${fmt(data.incEstTotal)}</span></div>
+    <div class="card-line"><span>Expense — estimate</span><span class="val">${fmt(estTotal)}</span></div>
+    <div class="card-line"><span>Expense — actual so far</span><span class="val">${fmt(actTotal)}</span></div>
     <div class="target-row">
       <span style="font-size:13px;">Target reduction</span>
       <span>
@@ -384,16 +432,15 @@ function renderTargetCard(data){
 /* ============================================================
  * EXPENSE TABLE — Subtype > Category accordion
  * ============================================================ */
-function renderExpenseTable(data){
-  const wrap = document.getElementById('expenseTableWrap');
-  if (!data.categories.length){
-    wrap.innerHTML = `<p class="state-msg">No expenses planned for this month yet — use "Add planned" above.</p>`;
+function buildAccordionTable(wrapEl, idPrefix, categoriesList, grandEstTotal, grandActTotal, emptyMsg, showActualDiff=true){
+  if (!categoriesList.length){
+    wrapEl.innerHTML = `<p class="state-msg">${emptyMsg}</p>`;
     return;
   }
 
   const subtypeOrder = [];
   const groups = {};
-  data.categories.forEach(c => {
+  categoriesList.forEach(c => {
     const st = c.subtype || 'Other';
     if (!groups[st]){ groups[st] = []; subtypeOrder.push(st); }
     groups[st].push(c);
@@ -402,80 +449,120 @@ function renderExpenseTable(data){
   const watchIdx = subtypeOrder.indexOf('Watch');
   if (watchIdx > -1) subtypeOrder.push(subtypeOrder.splice(watchIdx, 1)[0]);
 
-  const grandEstTotal = data.estTotal;
-
   let bodyRows = '';
   subtypeOrder.forEach((st, i) => {
-    const cats = groups[st].slice().sort((a,b) => b.actualAmount - a.actualAmount);
+    const cats = groups[st].slice().sort((a,b) => (showActualDiff ? b.actualAmount - a.actualAmount : b.estAmount - a.estAmount));
     const stEst = cats.reduce((s,c)=>s+c.estAmount,0);
-    const stAct = cats.reduce((s,c)=>s+c.actualAmount,0);
     const stPct = grandEstTotal ? (stEst/grandEstTotal*100) : 0;
-    const stDiff = stEst - stAct;
+    const stEstCell = `<td class="num">${fmt(stEst)} <span style="font-weight:400; opacity:0.75;">(${stPct.toFixed(0)}%)</span></td>`;
 
-    bodyRows += `
-      <tr class="subtype-row" id="st-${i}">
-        <td><i class="ti ti-chevron-right chevron"></i>${st}</td>
-        <td class="num">${fmt(stEst)} <span style="font-weight:400; opacity:0.75;">(${stPct.toFixed(0)}%)</span></td>
-        <td class="num">${fmt(stAct)}</td>
-        <td class="num" style="color:${stDiff<0?'var(--rust)':'inherit'};">${fmt(stDiff)}</td>
-        <td></td>
-      </tr>`;
+    if (showActualDiff){
+      const stAct = cats.reduce((s,c)=>s+c.actualAmount,0);
+      const stDiff = stEst - stAct;
+      bodyRows += `
+        <tr class="subtype-row" id="${idPrefix}-st-${i}">
+          <td><i class="ti ti-chevron-right chevron"></i>${st}</td>
+          ${stEstCell}
+          <td class="num">${fmt(stAct)}</td>
+          <td class="num" style="color:${stDiff<0?'var(--rust)':'inherit'};">${fmt(stDiff)}</td>
+          <td></td>
+        </tr>`;
+    } else {
+      bodyRows += `
+        <tr class="subtype-row" id="${idPrefix}-st-${i}">
+          <td><i class="ti ti-chevron-right chevron"></i>${st}</td>
+          ${stEstCell}
+          <td></td>
+        </tr>`;
+    }
 
     cats.forEach((c, j) => {
       const pctOfTotal = grandEstTotal ? (c.estAmount/grandEstTotal*100) : 0;
-      const diff = c.estAmount - c.actualAmount;
-      bodyRows += `
-        <tr class="category-row hidden cat-under-st-${i}" id="cat-${i}-${j}">
-          <td>${c.category}</td>
-          <td class="num">${fmt(c.estAmount)} <span style="color:var(--ink-soft);">(${pctOfTotal.toFixed(0)}%)</span></td>
-          <td class="num">${fmt(c.actualAmount)}</td>
-          <td class="num" style="color:${diff<0?'var(--rust)':'var(--teal)'};">${fmt(diff)}</td>
-          <td class="notes-text-cell">${c.notes || ''}</td>
-        </tr>`;
+      const estCell = `<td class="num">${fmt(c.estAmount)} <span style="color:var(--ink-soft);">(${pctOfTotal.toFixed(0)}%)</span></td>`;
+      if (showActualDiff){
+        const diff = c.estAmount - c.actualAmount;
+        bodyRows += `
+          <tr class="category-row hidden ${idPrefix}-cat-under-st-${i}" id="${idPrefix}-cat-${i}-${j}">
+            <td>${c.category}</td>
+            ${estCell}
+            <td class="num">${fmt(c.actualAmount)}</td>
+            <td class="num" style="color:${diff<0?'var(--rust)':'var(--teal)'};">${fmt(diff)}</td>
+            <td class="notes-text-cell">${c.notes || ''}</td>
+          </tr>`;
+      } else {
+        bodyRows += `
+          <tr class="category-row hidden ${idPrefix}-cat-under-st-${i}" id="${idPrefix}-cat-${i}-${j}">
+            <td>${c.category}</td>
+            ${estCell}
+            <td class="notes-text-cell">${c.notes || ''}</td>
+          </tr>`;
+      }
     });
   });
 
-  bodyRows += `
-    <tr class="total-row">
-      <td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td class="num">${fmt(data.actTotal)}</td><td class="num">${fmt(grandEstTotal - data.actTotal)}</td><td></td>
-    </tr>`;
+  const headCells = showActualDiff
+    ? '<th>Category</th><th class="num">Est</th><th class="num">Actual</th><th class="num">Difference</th><th>Notes</th>'
+    : '<th>Category</th><th class="num">Est</th><th>Notes</th>';
 
-  wrap.innerHTML = `<div class="table-scroll"><table>
-    <thead><tr><th>Category</th><th class="num">Est</th><th class="num">Actual</th><th class="num">Difference</th><th>Notes</th></tr></thead>
+  bodyRows += showActualDiff
+    ? `<tr class="total-row"><td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td class="num">${fmt(grandActTotal)}</td><td class="num">${fmt(grandEstTotal - grandActTotal)}</td><td></td></tr>`
+    : `<tr class="total-row"><td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td></td></tr>`;
+
+  wrapEl.innerHTML = `<div class="table-scroll"><table>
+    <thead><tr>${headCells}</tr></thead>
     <tbody>${bodyRows}</tbody>
   </table></div>`;
 
   subtypeOrder.forEach((st, i) => {
-    const stRow = document.getElementById(`st-${i}`);
+    const stRow = document.getElementById(`${idPrefix}-st-${i}`);
     stRow.addEventListener('click', () => {
       const chevron = stRow.querySelector('.chevron');
       const willOpen = !chevron.classList.contains('open');
       chevron.classList.toggle('open', willOpen);
-      document.querySelectorAll(`.cat-under-st-${i}`).forEach(row => row.classList.toggle('hidden', !willOpen));
+      document.querySelectorAll(`.${idPrefix}-cat-under-st-${i}`).forEach(row => row.classList.toggle('hidden', !willOpen));
     });
   });
+}
+
+function renderExpenseTable(data){
+  buildAccordionTable(
+    document.getElementById('expenseTableWrap'), 'exp',
+    data.categories, data.estTotal, data.actTotal,
+    'No expenses planned for this month yet — use "Add planned" above.'
+  );
+}
+
+function renderIncomeTable(data){
+  buildAccordionTable(
+    document.getElementById('incomeTableWrap'), 'inc',
+    data.incomeCategories, data.incEstTotal, data.incActTotal,
+    'No income planned for this month yet — use "Add planned income" above.',
+    false
+  );
 }
 
 /* ============================================================
  * ADD PLANNED / LOG SPEND / COPY MONTH — forms
  * ============================================================ */
 function closeAllForms(){
-  ['formAddPlanned','formLogSpend','formCopyMonth'].forEach(id => document.getElementById(id).classList.remove('open'));
+  ['formAddPlanned','formLogSpend','formCopyMonth','formAddPlannedIncome'].forEach(id => document.getElementById(id).classList.remove('open'));
 }
 
 async function ensureCategoryOptions(){
-  if (outflowCategories.length) return;
-  try { outflowCategories = await apiGet('categories'); } catch(err){ outflowCategories = []; }
+  if (allCategories.length) return;
+  try { allCategories = await apiGet('categories'); } catch(err){ allCategories = []; }
 }
 
-function populateCategorySelect(selectEl){
-  selectEl.innerHTML = outflowCategories.map(c => `<option value="${c.category}">${c.category} (${c.subtype})</option>`).join('');
+function populateCategorySelect(selectEl, type){
+  selectEl.innerHTML = allCategories
+    .filter(c => c.type === type)
+    .map(c => `<option value="${c.category}">${c.category} (${c.subtype})</option>`).join('');
 }
 
 document.getElementById('btnAddPlanned').addEventListener('click', async ()=>{
   closeAllForms();
   await ensureCategoryOptions();
-  populateCategorySelect(document.getElementById('fapCategory'));
+  populateCategorySelect(document.getElementById('fapCategory'), 'Outflow');
   document.getElementById('fapAmount').value = '';
   document.getElementById('fapNotes').value = '';
   document.getElementById('fapMsg').textContent = '';
@@ -503,7 +590,7 @@ document.getElementById('fapSave').addEventListener('click', async ()=>{
 document.getElementById('btnLogSpend').addEventListener('click', async ()=>{
   closeAllForms();
   await ensureCategoryOptions();
-  populateCategorySelect(document.getElementById('flsCategory'));
+  populateCategorySelect(document.getElementById('flsCategory'), 'Outflow');
   document.getElementById('flsAmount').value = '';
   document.getElementById('flsNote').value = '';
   document.getElementById('flsMsg').textContent = '';
@@ -545,6 +632,39 @@ document.getElementById('fcmSave').addEventListener('click', async ()=>{
     setTimeout(closeAllForms, 900);
   } catch(err){
     msg.textContent = 'Could not copy.'; msg.className = 'form-msg error';
+  }
+});
+
+document.getElementById('btnAddPlannedIncome').addEventListener('click', async ()=>{
+  closeAllForms();
+  await ensureCategoryOptions();
+  populateCategorySelect(document.getElementById('fapiCategory'), 'Inflow');
+  document.getElementById('fapiEstAmount').value = '';
+  document.getElementById('fapiActualAmount').value = '';
+  document.getElementById('fapiNotes').value = '';
+  document.getElementById('fapiMsg').textContent = '';
+  document.getElementById('formAddPlannedIncome').classList.add('open');
+});
+document.getElementById('fapiCancel').addEventListener('click', closeAllForms);
+document.getElementById('fapiSave').addEventListener('click', async ()=>{
+  const category = document.getElementById('fapiCategory').value;
+  const estAmount = document.getElementById('fapiEstAmount').value;
+  const actualAmount = document.getElementById('fapiActualAmount').value;
+  const notes = document.getElementById('fapiNotes').value;
+  const msg = document.getElementById('fapiMsg');
+  if (!category){ msg.textContent = 'Choose a category.'; msg.className = 'form-msg error'; return; }
+  if (estAmount === '' || isNaN(estAmount) || Number(estAmount) < 0){ msg.textContent = 'Enter a valid estimated amount.'; msg.className = 'form-msg error'; return; }
+  if (actualAmount !== '' && (isNaN(actualAmount) || Number(actualAmount) < 0)){ msg.textContent = 'Actual amount must be a valid number.'; msg.className = 'form-msg error'; return; }
+  msg.textContent = 'Saving…'; msg.className = 'form-msg';
+  try {
+    const body = { action:'addPlanned', month: selectedMonth, category, estAmount: Number(estAmount), notes };
+    if (actualAmount !== '') body.actualAmount = Number(actualAmount);
+    await apiPost(body);
+    msg.textContent = 'Saved.'; msg.className = 'form-msg ok';
+    await loadAndRenderExpenses();
+    setTimeout(closeAllForms, 600);
+  } catch(err){
+    msg.textContent = 'Could not save.'; msg.className = 'form-msg error';
   }
 });
 
