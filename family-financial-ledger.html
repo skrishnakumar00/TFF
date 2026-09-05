@@ -31,6 +31,7 @@
 
   .section{margin-top:28px;}
   .col-label{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px 2px;}
+  .note-line{font-size:11.5px; color:var(--ink-soft); margin:0; font-style:italic;}
 
   .sync-row{display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;}
   .sync-time{font-size:11.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
@@ -104,7 +105,8 @@
   .variance{font-size:11px; margin-left:5px;}
   .variance.over{color:var(--rust);}
   .variance.ok{color:var(--teal);}
-  .notes-text-cell{font-size:11.5px; color:var(--ink-soft); max-width:160px;}
+  .bracket-note{display:block; font-size:11px; margin-top:2px; opacity:0.85;}
+  .notes-text-cell{font-size:11.5px; color:var(--ink-soft); max-width:300px; white-space:normal; overflow-wrap:break-word; word-break:break-word;}
 
   tr.total-row td{border-top:2px solid var(--ink); border-bottom:none; font-weight:600; font-size:13.5px;}
 
@@ -142,9 +144,11 @@
     <div class="card" id="targetCard"><p class="state-msg">Loading…</p></div>
 
     <p class="col-label" style="margin-top:16px;">Expense categories</p>
+    <p class="note-line" id="compoundingCaption" style="margin-bottom:10px;"></p>
     <div class="action-row">
       <button class="btn secondary" id="btnAddPlanned"><i class="ti ti-plus"></i> Add planned</button>
       <button class="btn secondary" id="btnLogSpend"><i class="ti ti-plus"></i> Log spend</button>
+      <button class="btn secondary" id="btnLogSaving"><i class="ti ti-plus"></i> Log saving</button>
       <button class="btn secondary" id="btnCopyMonth"><i class="ti ti-copy"></i> Copy prev. month</button>
     </div>
 
@@ -188,6 +192,27 @@
         <button class="btn secondary" id="flsCancel">Cancel</button>
       </div>
       <p class="form-msg" id="flsMsg"></p>
+    </div>
+
+    <!-- Log Saving form -->
+    <div class="form-panel" id="formLogSaving">
+      <div class="form-row">
+        <label>Category</label>
+        <select id="flgCategory"></select>
+      </div>
+      <div class="form-row">
+        <label>Amount saved (₹)</label>
+        <input type="number" id="flgAmount" placeholder="e.g. 500">
+      </div>
+      <div class="form-row">
+        <label>Remark (optional)</label>
+        <input type="text" id="flgNote" placeholder="e.g. bought generic brand instead">
+      </div>
+      <div class="form-actions">
+        <button class="btn" id="flgSave">Add to saved</button>
+        <button class="btn secondary" id="flgCancel">Cancel</button>
+      </div>
+      <p class="form-msg" id="flgMsg"></p>
     </div>
 
     <!-- Copy Month form -->
@@ -432,7 +457,7 @@ function renderTargetCard(data){
 /* ============================================================
  * EXPENSE TABLE — Subtype > Category accordion
  * ============================================================ */
-function buildAccordionTable(wrapEl, idPrefix, categoriesList, grandEstTotal, grandActTotal, emptyMsg, showActualDiff=true){
+function buildAccordionTable(wrapEl, idPrefix, categoriesList, grandEstTotal, grandActTotal, emptyMsg, showActualDiff=true, showSaved=false, grandSavedTotal=0, grandCompoundedTotal=0){
   if (!categoriesList.length){
     wrapEl.innerHTML = `<p class="state-msg">${emptyMsg}</p>`;
     return;
@@ -459,13 +484,21 @@ function buildAccordionTable(wrapEl, idPrefix, categoriesList, grandEstTotal, gr
     if (showActualDiff){
       const stAct = cats.reduce((s,c)=>s+c.actualAmount,0);
       const stDiff = stEst - stAct;
+      const stDiffBracket = `<span class="bracket-note" style="color:${stDiff<0?'var(--rust)':'inherit'};">(${stDiff<0?'-':''}${fmt(Math.abs(stDiff))})</span>`;
+      let savedCell = '';
+      if (showSaved){
+        const stSaved = cats.reduce((s,c)=>s+c.savedAmount,0);
+        const stCompounded = cats.reduce((s,c)=>s+c.compoundedAmount,0);
+        savedCell = `<td class="num">${fmt(stSaved)} <span class="bracket-note">(${fmt(stCompounded)})</span></td>`;
+      }
       bodyRows += `
         <tr class="subtype-row" id="${idPrefix}-st-${i}">
           <td><i class="ti ti-chevron-right chevron"></i>${st}</td>
           ${stEstCell}
-          <td class="num">${fmt(stAct)}</td>
-          <td class="num" style="color:${stDiff<0?'var(--rust)':'inherit'};">${fmt(stDiff)}</td>
+          <td class="num">${fmt(stAct)} ${stDiffBracket}</td>
+          ${savedCell}
           <td></td>
+          ${showSaved ? '<td></td>' : ''}
         </tr>`;
     } else {
       bodyRows += `
@@ -481,13 +514,18 @@ function buildAccordionTable(wrapEl, idPrefix, categoriesList, grandEstTotal, gr
       const estCell = `<td class="num">${fmt(c.estAmount)} <span style="color:var(--ink-soft);">(${pctOfTotal.toFixed(0)}%)</span></td>`;
       if (showActualDiff){
         const diff = c.estAmount - c.actualAmount;
+        const diffBracket = `<span class="bracket-note" style="color:${diff<0?'var(--rust)':'var(--teal)'};">(${diff<0?'-':''}${fmt(Math.abs(diff))})</span>`;
+        const savedCell = showSaved
+          ? `<td class="num">${fmt(c.savedAmount)} <span class="bracket-note">(${fmt(c.compoundedAmount)})</span></td>`
+          : '';
         bodyRows += `
           <tr class="category-row hidden ${idPrefix}-cat-under-st-${i}" id="${idPrefix}-cat-${i}-${j}">
             <td>${c.category}</td>
             ${estCell}
-            <td class="num">${fmt(c.actualAmount)}</td>
-            <td class="num" style="color:${diff<0?'var(--rust)':'var(--teal)'};">${fmt(diff)}</td>
+            <td class="num">${fmt(c.actualAmount)} ${diffBracket}</td>
+            ${savedCell}
             <td class="notes-text-cell">${c.notes || ''}</td>
+            ${showSaved ? `<td class="notes-text-cell">${c.savedNotes || ''}</td>` : ''}
           </tr>`;
       } else {
         bodyRows += `
@@ -500,13 +538,27 @@ function buildAccordionTable(wrapEl, idPrefix, categoriesList, grandEstTotal, gr
     });
   });
 
-  const headCells = showActualDiff
-    ? '<th>Category</th><th class="num">Est</th><th class="num">Actual</th><th class="num">Difference</th><th>Notes</th>'
-    : '<th>Category</th><th class="num">Est</th><th>Notes</th>';
-
-  bodyRows += showActualDiff
-    ? `<tr class="total-row"><td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td class="num">${fmt(grandActTotal)}</td><td class="num">${fmt(grandEstTotal - grandActTotal)}</td><td></td></tr>`
-    : `<tr class="total-row"><td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td></td></tr>`;
+  let headCells, totalRow;
+  if (showActualDiff && showSaved){
+    headCells = '<th>Category</th><th class="num">Est</th><th class="num">Actual</th><th class="num">Saved</th><th>Notes</th><th>Saved notes</th>';
+    const grandDiff = grandEstTotal - grandActTotal;
+    const grandDiffBracket = `<span class="bracket-note" style="color:${grandDiff<0?'var(--rust)':'var(--teal)'};">(${grandDiff<0?'-':''}${fmt(Math.abs(grandDiff))})</span>`;
+    totalRow = `<tr class="total-row">
+      <td>Total</td><td class="num">${fmt(grandEstTotal)}</td>
+      <td class="num">${fmt(grandActTotal)} ${grandDiffBracket}</td>
+      <td class="num">${fmt(grandSavedTotal)} <span class="bracket-note">(${fmt(grandCompoundedTotal)})</span></td>
+      <td></td><td></td>
+    </tr>`;
+  } else if (showActualDiff){
+    headCells = '<th>Category</th><th class="num">Est</th><th class="num">Actual</th><th>Notes</th>';
+    const grandDiff = grandEstTotal - grandActTotal;
+    const grandDiffBracket = `<span class="bracket-note" style="color:${grandDiff<0?'var(--rust)':'var(--teal)'};">(${grandDiff<0?'-':''}${fmt(Math.abs(grandDiff))})</span>`;
+    totalRow = `<tr class="total-row"><td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td class="num">${fmt(grandActTotal)} ${grandDiffBracket}</td><td></td></tr>`;
+  } else {
+    headCells = '<th>Category</th><th class="num">Est</th><th>Notes</th>';
+    totalRow = `<tr class="total-row"><td>Total</td><td class="num">${fmt(grandEstTotal)}</td><td></td></tr>`;
+  }
+  bodyRows += totalRow;
 
   wrapEl.innerHTML = `<div class="table-scroll"><table>
     <thead><tr>${headCells}</tr></thead>
@@ -528,8 +580,15 @@ function renderExpenseTable(data){
   buildAccordionTable(
     document.getElementById('expenseTableWrap'), 'exp',
     data.categories, data.estTotal, data.actTotal,
-    'No expenses planned for this month yet — use "Add planned" above.'
+    'No expenses planned for this month yet — use "Add planned" above.',
+    true, true, data.savedTotal, data.compoundedTotal
   );
+  const capEl = document.getElementById('compoundingCaption');
+  if (capEl){
+    capEl.textContent = (data.compoundTenorYears && data.compoundRatePct)
+      ? `Compounded assumes each month's saving recurs monthly for ${data.compoundTenorYears} years at ${data.compoundRatePct}% annually.`
+      : '';
+  }
 }
 
 function renderIncomeTable(data){
@@ -545,7 +604,7 @@ function renderIncomeTable(data){
  * ADD PLANNED / LOG SPEND / COPY MONTH — forms
  * ============================================================ */
 function closeAllForms(){
-  ['formAddPlanned','formLogSpend','formCopyMonth','formAddPlannedIncome'].forEach(id => document.getElementById(id).classList.remove('open'));
+  ['formAddPlanned','formLogSpend','formLogSaving','formCopyMonth','formAddPlannedIncome'].forEach(id => document.getElementById(id).classList.remove('open'));
 }
 
 async function ensureCategoryOptions(){
@@ -607,6 +666,34 @@ document.getElementById('flsSave').addEventListener('click', async ()=>{
   msg.textContent = 'Saving…'; msg.className = 'form-msg';
   try {
     await apiPost({ action:'logSpend', month: selectedMonth, category, amount: Number(amount), note });
+    msg.textContent = 'Added.'; msg.className = 'form-msg ok';
+    await loadAndRenderExpenses();
+    setTimeout(closeAllForms, 600);
+  } catch(err){
+    msg.textContent = 'Could not save.'; msg.className = 'form-msg error';
+  }
+});
+
+document.getElementById('btnLogSaving').addEventListener('click', async ()=>{
+  closeAllForms();
+  await ensureCategoryOptions();
+  populateCategorySelect(document.getElementById('flgCategory'), 'Outflow');
+  document.getElementById('flgAmount').value = '';
+  document.getElementById('flgNote').value = '';
+  document.getElementById('flgMsg').textContent = '';
+  document.getElementById('formLogSaving').classList.add('open');
+});
+document.getElementById('flgCancel').addEventListener('click', closeAllForms);
+document.getElementById('flgSave').addEventListener('click', async ()=>{
+  const category = document.getElementById('flgCategory').value;
+  const amount = document.getElementById('flgAmount').value;
+  const note = document.getElementById('flgNote').value;
+  const msg = document.getElementById('flgMsg');
+  if (!category){ msg.textContent = 'Choose a category.'; msg.className = 'form-msg error'; return; }
+  if (amount === '' || isNaN(amount) || Number(amount) <= 0){ msg.textContent = 'Enter a valid amount.'; msg.className = 'form-msg error'; return; }
+  msg.textContent = 'Saving…'; msg.className = 'form-msg';
+  try {
+    await apiPost({ action:'logSaving', month: selectedMonth, category, amount: Number(amount), note });
     msg.textContent = 'Added.'; msg.className = 'form-msg ok';
     await loadAndRenderExpenses();
     setTimeout(closeAllForms, 600);
