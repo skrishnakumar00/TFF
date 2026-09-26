@@ -312,7 +312,7 @@
 
     <!-- Copy Month form -->
     <div class="form-panel" id="formCopyMonth">
-      <p style="font-size:13px; margin:0 0 10px;">Copy every planned category (income and expense) and amount from the previous month into <span id="copyTargetLabel"></span>. Actual amounts start blank. Categories already planned this month are left untouched.</p>
+      <p style="font-size:13px; margin:0 0 10px;">Copy every planned category (income and expense) and amount from the previous month into <span id="copyTargetLabel"></span>. Actual amounts and notes start blank. Categories already planned this month are left untouched.</p>
       <div class="form-actions">
         <button class="btn" id="fcmSave">Copy now</button>
         <button class="btn secondary" id="fcmCancel">Cancel</button>
@@ -400,8 +400,10 @@ let allCategories = [];
  * MONTH PILLS
  * ============================================================ */
 function renderMonthPills(){
+  // MONTHS-AHEAD: a month beyond currentMonth is shown for early setup, not
+  // yet live — tagged "planning" here and on the masthead stamp below.
   document.getElementById('monthPills').innerHTML = months.map(m => `
-    <button class="pill ${m===selectedMonth?'active':''}" data-month="${m}">${monthLabel(m)}${m===currentMonth?' · current':''}</button>`).join('');
+    <button class="pill ${m===selectedMonth?'active':''}" data-month="${m}">${monthLabel(m)}${m===currentMonth?' · current':(m>currentMonth?' · planning':'')}</button>`).join('');
   document.querySelectorAll('#monthPills .pill').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       selectedMonth = btn.dataset.month;
@@ -436,7 +438,8 @@ async function loadAndRenderExpenses(){
     return;
   }
   updateSyncTime();
-  document.getElementById('mastheadStamp').textContent = monthLabel(currentData.month) + (currentData.isCurrent ? ' · in progress' : '');
+  document.getElementById('mastheadStamp').textContent = monthLabel(currentData.month)
+    + (currentData.isCurrent ? ' · in progress' : (currentData.month > currentMonth ? ' · planning' : ''));
   document.getElementById('exceptionsBanner').innerHTML = '';
   renderNetPositionCard(currentData);
   renderTargetCard(currentData);
