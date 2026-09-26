@@ -112,6 +112,76 @@
 
   .state-msg{font-size:13px; color:var(--ink-soft); padding:14px 4px; font-style:italic;}
   footer{margin-top:36px; text-align:center; font-size:11.5px; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+
+  /* ===== TAB-NAV styles (start) — remove with the TAB-NAV markup/script ===== */
+  .tab-bar{display:flex; gap:6px; margin-bottom:16px; background:var(--paper-raised); border:0.5px solid var(--rule); border-radius:14px; padding:4px;}
+  .tab-btn{flex:1; position:relative; font-family:'IBM Plex Mono',monospace; font-size:12.5px; background:none; border:none; color:var(--ink-soft); padding:9px 10px; border-radius:10px; cursor:pointer;}
+  .tab-btn.active{background:var(--ledger); color:#FBFAF4;}
+  .tab-dot{display:none; position:absolute; top:6px; right:14px; width:7px; height:7px; border-radius:50%; background:#EF9F27; box-shadow:0 0 0 2px var(--paper-raised);}
+  .tab-dot.show{display:inline-block;}
+  .tab-btn.active .tab-dot{box-shadow:0 0 0 2px var(--ledger);}
+  .tab-panel.hidden{display:none;}
+  /* ===== TAB-NAV styles (end) ===== */
+
+  /* ===== HABIT-LOG styles (start) — remove with the HABIT-LOG markup and script blocks =====
+     Vibrant theme, scoped to #habitSection only — the Ledger tab keeps the original palette. */
+  #habitSection{--h-ink:#1B241E;}
+  #habitSection .state-msg{color:var(--ink-soft);}
+
+  .habit-hero{position:relative; overflow:hidden; border-radius:18px; padding:18px 18px 16px; background:linear-gradient(155deg,#E2643F,#D85A30); color:#fff; margin-bottom:12px; box-shadow:0 6px 18px rgba(216,90,48,0.25);}
+  .habit-hero.cold{background:linear-gradient(155deg,#8A8776,#6E6C5E); box-shadow:none;}
+  .habit-hero-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .habit-hero-label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; opacity:0.85; margin:0 0 2px;}
+  .habit-hero-streak{font-family:'Fraunces',serif; font-size:38px; font-weight:500; line-height:1.05; display:flex; align-items:center; gap:8px;}
+  .habit-hero-streak i{font-size:32px;}
+  .habit-hero-best{font-size:11.5px; opacity:0.9; margin-top:2px;}
+  .habit-hero-freezes{background:rgba(255,255,255,0.18); border-radius:12px; padding:7px 10px; text-align:center; font-size:16px;}
+  .habit-hero-freezes i{margin:0 1px;}
+  .habit-hero-freezes i.empty{opacity:0.35;}
+  .habit-hero-freezes-label{font-size:10px; margin-top:3px; opacity:0.9; font-family:'IBM Plex Mono',monospace;}
+
+  .habit-stats{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px;}
+  .habit-stat-tile{border-radius:14px; padding:10px 12px;}
+  .habit-stat-tile.sv{background:var(--teal-bg); color:#085041;}
+  .habit-stat-tile.ws{background:rgba(239,159,39,0.18); color:#633806;}
+  .habit-stat-tile-label{font-size:10.5px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.06em; opacity:0.85;}
+  .habit-stat-tile-num{font-size:20px; font-weight:500; margin-top:2px;}
+  .habit-stat-tile-num span{font-size:12px; font-weight:400;}
+  .habit-stat-tile-sub{font-size:11px; margin-top:1px; opacity:0.9;}
+
+  .habit-ladder-label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px 2px;}
+  .habit-ladder-wrap{display:flex; gap:14px; overflow-x:auto; padding:4px 2px 14px; margin-bottom:2px;}
+  .habit-medal{flex:0 0 auto; width:68px; text-align:center;}
+  .habit-medal svg{display:block; margin:0 auto;}
+  .habit-medal-name{font-size:10.5px; line-height:1.25; margin-top:4px; color:var(--ink-soft);}
+  .habit-medal.earned .habit-medal-name{color:var(--ink); font-weight:500;}
+  .habit-medal.next .habit-medal-name{color:var(--ink); font-weight:500;}
+  .habit-medal-togo{font-size:9.5px; font-family:'IBM Plex Mono',monospace; color:var(--ink-soft); margin-top:1px;}
+
+  .habit-days{display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap;}
+  .habit-day{font-family:'IBM Plex Mono',monospace; font-size:12px; background:none; border:1px solid var(--rule); color:var(--ink-soft); padding:5px 11px; border-radius:16px; cursor:pointer;}
+  .habit-day.active{background:var(--ledger); border-color:var(--ledger); color:#FBFAF4;}
+  .habit-day .done{font-size:12px; margin-left:3px;}
+  .habit-row-label{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; margin:0 0 6px 2px; font-weight:600;}
+  .habit-row-label.sv{color:#0F6E56;}
+  .habit-row-label.ws{color:#854F0B;}
+  .habit-chips{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;}
+  .habit-chip{font-family:'IBM Plex Sans',sans-serif; font-size:13px; background:#fff; border:1.5px solid var(--rule); color:var(--ink-soft); padding:6px 13px; border-radius:16px; cursor:pointer; transition:transform .12s ease;}
+  .habit-chip.nn{border-style:dashed;}
+  .habit-chip.on.sv{background:#1D9E75; border-color:#1D9E75; color:#fff;}
+  .habit-chip.on.ws{background:#EF9F27; border-color:#EF9F27; color:#412402;}
+  .habit-chip.pop{transform:scale(1.1);}
+  .habit-remark{width:100%; margin-bottom:10px;}
+  .habit-close{width:100%; background:#16261F;}
+
+  .habit-celebrate-overlay{position:relative; border-radius:18px; padding:24px 18px; text-align:center; margin-bottom:14px; background:linear-gradient(160deg,#3C3489,#26215C); color:#fff; overflow:hidden;}
+  .habit-celebrate-overlay.hidden{display:none;}
+  .habit-celebrate-eyebrow{font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:#CECBF6; margin-bottom:4px;}
+  .habit-celebrate-name{font-family:'Fraunces',serif; font-size:21px; font-weight:500; margin-top:6px;}
+  .habit-celebrate-tier{font-size:12.5px; color:#CECBF6; margin-top:2px;}
+  .habit-celebrate-dismiss{margin-top:16px; background:#EF9F27; color:#412402; border:none; border-radius:12px; padding:10px 16px; font-family:'IBM Plex Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; width:100%;}
+  .habit-confetti{position:absolute; top:0; left:0; right:0; height:56px; opacity:0.9;}
+  /* ===== HABIT-LOG styles (end) ===== */
 </style>
 </head>
 <body>
@@ -133,6 +203,31 @@
       <button class="refresh-btn" id="refreshBtn"><i class="ti ti-refresh"></i> Refresh</button>
       <span class="sync-time" id="syncTime"></span>
     </div>
+
+    <!-- ===== TAB-NAV markup (start) — remove with the TAB-NAV styles/script to fold the two
+         panels back into one page. Tags: New. Splits the page into a Ledger panel (existing
+         content, unchanged) and a Daily habit panel (the HABIT-LOG block, now restyled). ===== -->
+    <div class="tab-bar" id="tabBar">
+      <button type="button" class="tab-btn" data-tab="habit" id="tabBtnHabit">Daily habit<span class="tab-dot" id="tabHabitDot"></span></button>
+      <button type="button" class="tab-btn" data-tab="ledger" id="tabBtnLedger">Ledger</button>
+    </div>
+    <!-- ===== TAB-NAV markup (end) ===== -->
+
+    <div class="tab-panel" id="tabPanelHabit">
+      <!-- ===== HABIT-LOG markup (start) — remove with the HABIT-LOG styles and script blocks ===== -->
+      <div id="habitSection">
+        <div class="habit-hero" id="habitHeroCard"><p class="state-msg">Loading…</p></div>
+        <div class="habit-stats" id="habitStatsCard"></div>
+        <p class="habit-ladder-label">Level ladder</p>
+        <div class="habit-ladder-wrap" id="habitLadderCard"></div>
+        <div class="habit-celebrate-overlay hidden" id="habitCelebrate"></div>
+        <div class="card habit-input-card" id="habitInputCard" style="display:none;"></div>
+      </div>
+      <!-- ===== HABIT-LOG markup (end) ===== -->
+    </div>
+
+    <div class="tab-panel hidden" id="tabPanelLedger">
+
     <div class="pill-row" id="monthPills"><p class="state-msg">Loading months…</p></div>
 
     <div id="exceptionsBanner"></div>
@@ -257,6 +352,8 @@
     </div>
 
     <div id="incomeTableWrap"><p class="state-msg">Loading…</p></div>
+
+    </div>
   </div>
 
   <footer>Data from the household Google Sheet, via Apps Script</footer>
@@ -784,6 +881,408 @@ async function loadMeta(){
   renderMonthPills();
   loadAndRenderExpenses();
 })();
+
+/* ===================================================================
+ * HABIT-LOG script (start) — remove with the HABIT-LOG styles and markup blocks
+ * -------------------------------------------------------------------
+ * SPEC TAG
+ * Feature: Daily habit log (savings / wastage chips, streak, freezes, badges)
+ * Status: New. Independent of the month pills; no existing function changed.
+ *   Hooks: own init call at the end of this block, plus a second click
+ *   listener on the existing Refresh button.
+ * Data (Google Sheet tabs): Config (Habit Days Per Badge, Habit Freeze Every
+ *   Days, Habit Max Freezes Held, Habit Backdate Days), Habit Categories
+ *   (Category Id, Name, Sort Order, Active), Habit Badges (Level, Name),
+ *   Habit Daily Log (Date, Savings, Wastage, Remark, Updated At).
+ * API: GET action=habitData -> { config, categories, badges, log, today } or { error }
+ *      POST { action:'habitCloseDay', date, savings, wastage, remark } -> { success:true } or { success:false, error }
+ * Modified in v3: save response read as `success` (was `ok`) to match the
+ *   existing Apps Script convention; data source moved to the Config tab and
+ *   Title Case tab/header names. No UI change.
+ * Modified in v4: moved onto its own tab (see TAB-NAV block) and restyled —
+ *   hero streak card, stat tiles, a hexagon "level ladder" for badges (tier
+ *   colours in HABIT_TIERS below, cycling if there are more than 8 levels),
+ *   and a full celebration screen on a new badge (replacing the v3 inline
+ *   banner). Added: best-streak-ever, derived alongside the current streak.
+ *   No change to validations, the save flow, or the data model.
+ *
+ * Validations
+ * - A day can be closed for today or up to backdateDays earlier; no future dates.
+ * - Savings and Wastage each need at least one chip. "Nothing notable" is on its
+ *   own; picking it clears the category chips in that row, and picking a
+ *   category clears it.
+ * - Remark is optional, at most 200 characters, one per day.
+ * - Closing an already closed day updates that day's row (one row per date).
+ * - Inactive categories are hidden as chips but still count in history.
+ *
+ * Calculations (replayed from HabitDailyLog on every load, nothing stored)
+ * - Walk every date from the first logged date to today.            CONFIRMED
+ * - Logged date: streak + 1.                                        CONFIRMED
+ * - Missed date = no row and older than today minus backdateDays.
+ *   Today and dates inside the backdate window are pending, never missed. CONFIRMED
+ * - Missed date: if a freeze is held, use one (streak holds, date frozen);
+ *   otherwise streak resets to 0.                                   CONFIRMED
+ * - Freezes: +1 each time the streak reaches a multiple of freezeEveryDays,
+ *   capped at maxFreezesHeld; frozen dates do not add to the streak. CONFIRMED
+ * - Counts over the current streak (frozen dates excluded):
+ *   Savings saved = days not NONE, nothing notable = NONE days; same for
+ *   Wastage (caught / nothing notable). Each pair adds up to the streak. CONFIRMED
+ * - Badges: next unearned level L is earned on the day the streak reaches
+ *   L x daysPerBadge. Earned badges are kept after a reset; the next one needs
+ *   its full streak from 0. Days to go = L x daysPerBadge - streak.  CONFIRMED
+ * - Once every level in HabitBadges is earned, no further badges until more
+ *   levels are added to the sheet.          UNVERIFIED — NEEDS CONFIRMATION
+ *
+ * Dependencies: Apps Script actions habitData and habitCloseDay (HABIT-LOG
+ *   block in family financial ledger v2.gs);
+ *   existing apiGet, apiPost, refreshBtn.
+ * =================================================================== */
+const HABIT_NONE = 'NONE';
+const HABIT_DEFAULTS = { daysPerBadge: 7, freezeEveryDays: 7, maxFreezesHeld: 2, backdateDays: 1 };
+const habitState = { loaded: false, config: null, categories: [], badges: [], log: [], today: '', selectedDate: '', draft: null, saving: false };
+
+// Tier colours for the level ladder — level 1 is the outermost index, cycling
+// if HabitBadges ever has more than 8 levels. Kept in code per Krishna's call.
+const HABIT_TIERS = [
+  { tier: 'Bronze',   fill:'#C97A40', border:'#8A4F1F', text:'#fff' },
+  { tier: 'Silver',   fill:'#B4B2A9', border:'#6E6C5E', text:'#2C2C2A' },
+  { tier: 'Gold',     fill:'#EF9F27', border:'#854F0B', text:'#412402' },
+  { tier: 'Emerald',  fill:'#1D9E75', border:'#085041', text:'#fff' },
+  { tier: 'Sapphire', fill:'#378ADD', border:'#0C447C', text:'#fff' },
+  { tier: 'Amethyst', fill:'#7F77DD', border:'#3C3489', text:'#fff' },
+  { tier: 'Ruby',     fill:'#D4537E', border:'#72243E', text:'#fff' },
+  { tier: 'Diamond',  fill:'#5DCAA5', border:'#04342C', text:'#04342C' },
+];
+function habitTier(level){ return HABIT_TIERS[(level - 1) % HABIT_TIERS.length]; }
+
+function habitPad(n){ return String(n).padStart(2,'0'); }
+function habitTodayIso(){ const d = new Date(); return `${d.getFullYear()}-${habitPad(d.getMonth()+1)}-${habitPad(d.getDate())}`; }
+function habitAddDays(iso, n){
+  const [y,m,d] = iso.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m-1, d + n));
+  return `${t.getUTCFullYear()}-${habitPad(t.getUTCMonth()+1)}-${habitPad(t.getUTCDate())}`;
+}
+function habitDayLabel(iso){ const [, m, d] = iso.split('-').map(Number); return `${d} ${MONTH_NAMES[m-1]}`; }
+function habitEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function habitSplit(v){ return String(v || '').split(',').map(s => s.trim()).filter(Boolean); }
+
+/* Pure derivation — see Calculations in the spec tag above */
+function habitDerive(log, config, badges, todayIso){
+  const cfg = Object.assign({}, HABIT_DEFAULTS, config || {});
+  const byDate = {};
+  log.forEach(r => { if (r.date && r.date <= todayIso) byDate[r.date] = r; });
+  const dates = Object.keys(byDate).sort();
+  const levels = badges.map(b => Number(b.level)).sort((a,b) => a-b);
+  const out = { streak:0, best:0, freezes:0, frozenDates:[], earned:[], window:[] };
+  if (!dates.length) return habitSummarise(out, cfg, badges, levels);
+  const cutoff = habitAddDays(todayIso, -cfg.backdateDays);
+  for (let d = dates[0]; d <= todayIso; d = habitAddDays(d, 1)){
+    const row = byDate[d];
+    if (row){
+      out.streak += 1;
+      out.window.push(row);
+      if (out.streak % cfg.freezeEveryDays === 0) out.freezes = Math.min(cfg.maxFreezesHeld, out.freezes + 1);
+      const next = out.earned.length + 1;
+      if (levels.includes(next) && out.streak >= next * cfg.daysPerBadge) out.earned.push({ level: next, date: d });
+    } else if (d < cutoff){
+      if (out.freezes > 0){ out.freezes -= 1; out.frozenDates.push(d); }
+      else { out.streak = 0; out.window = []; }
+    }
+    out.best = Math.max(out.best, out.streak);
+  }
+  return habitSummarise(out, cfg, badges, levels);
+}
+function habitSummarise(out, cfg, badges, levels){
+  const w = out.window;
+  const nextLevel = out.earned.length + 1;
+  return {
+    streak: out.streak,
+    best: Math.max(out.best, out.streak),
+    freezes: out.freezes,
+    maxFreezes: cfg.maxFreezesHeld,
+    frozenDates: out.frozenDates,
+    earned: out.earned,
+    savedDays: w.filter(r => r.savings !== HABIT_NONE).length,
+    savedNone: w.filter(r => r.savings === HABIT_NONE).length,
+    wasteDays: w.filter(r => r.wastage !== HABIT_NONE).length,
+    wasteNone: w.filter(r => r.wastage === HABIT_NONE).length,
+    nextLevel: levels.includes(nextLevel) ? nextLevel : null,
+    daysToGo: levels.includes(nextLevel) ? Math.max(0, nextLevel * cfg.daysPerBadge - out.streak) : null,
+  };
+}
+
+function habitRowFor(date){ return habitState.log.find(r => r.date === date) || null; }
+function habitOpenDates(){
+  const n = habitState.config.backdateDays;
+  const out = [];
+  for (let i = 0; i <= n; i++) out.push(habitAddDays(habitState.today, -i));
+  return out;
+}
+function habitLoadDraft(date){
+  const row = habitRowFor(date);
+  habitState.selectedDate = date;
+  habitState.draft = {
+    savings: row ? habitSplit(row.savings) : [],
+    wastage: row ? habitSplit(row.wastage) : [],
+    remark: row ? (row.remark || '') : '',
+  };
+}
+
+// Small hexagon medal, filled solid for an earned badge, outlined with a
+// progress ring for the next one, flat grey (with a lock) when still locked.
+function habitMedalSvg(level, state, ringFrac){
+  const tier = habitTier(level);
+  const pts = '30,4 53,17 53,43 30,56 7,43 7,17';
+  if (state === 'earned'){
+    return `<svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true">
+      <polygon points="${pts}" fill="${tier.fill}" stroke="${tier.border}" stroke-width="3"/>
+      <text x="30" y="35" text-anchor="middle" font-size="15" font-weight="500" fill="${tier.text}" font-family="IBM Plex Sans, sans-serif">${level}</text>
+    </svg>`;
+  }
+  if (state === 'next'){
+    const c = Math.PI * 2 * 25;
+    return `<svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true">
+      <circle cx="30" cy="30" r="25" fill="none" stroke="var(--rule-soft)" stroke-width="4"/>
+      <circle cx="30" cy="30" r="25" fill="none" stroke="${tier.fill}" stroke-width="4" stroke-linecap="round"
+        stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - ringFrac)}" transform="rotate(-90 30 30)"/>
+      <polygon points="${pts}" fill="#fff" stroke="${tier.fill}" stroke-width="3"/>
+      <text x="30" y="35" text-anchor="middle" font-size="15" font-weight="500" fill="${tier.border}" font-family="IBM Plex Sans, sans-serif">${level}</text>
+    </svg>`;
+  }
+  return `<svg width="60" height="60" viewBox="0 0 60 60" aria-hidden="true">
+    <polygon points="${pts}" fill="var(--rule-soft)" stroke="var(--rule)" stroke-width="2"/>
+    <text x="30" y="35" text-anchor="middle" font-size="15" font-weight="500" fill="var(--ink-soft)" font-family="IBM Plex Sans, sans-serif">${level}</text>
+  </svg>`;
+}
+
+function habitRenderStatus(){
+  const s = habitDerive(habitState.log, habitState.config, habitState.badges, habitState.today);
+  const flakes = Array.from({ length: s.maxFreezes }, (_, i) =>
+    `<i class="ti ti-snowflake ${i < s.freezes ? '' : 'empty'}"></i>`).join('');
+
+  const hero = document.getElementById('habitHeroCard');
+  hero.className = 'habit-hero' + (s.streak ? '' : ' cold');
+  hero.innerHTML = `
+    <div class="habit-hero-top">
+      <div>
+        <p class="habit-hero-label">Current streak</p>
+        <div class="habit-hero-streak"><i class="ti ti-flame"></i>${s.streak}<span style="font-size:15px; font-weight:400;">day${s.streak === 1 ? '' : 's'}</span></div>
+        <p class="habit-hero-best">Best: ${s.best} day${s.best === 1 ? '' : 's'}</p>
+      </div>
+      <div class="habit-hero-freezes">
+        ${flakes}
+        <div class="habit-hero-freezes-label">${s.freezes} freeze${s.freezes === 1 ? '' : 's'}</div>
+      </div>
+    </div>`;
+
+  document.getElementById('habitStatsCard').innerHTML = `
+    <div class="habit-stat-tile sv">
+      <div class="habit-stat-tile-label">Savings</div>
+      <div class="habit-stat-tile-num">${s.savedDays} <span>saved</span></div>
+      <div class="habit-stat-tile-sub">${s.savedNone} nothing notable</div>
+    </div>
+    <div class="habit-stat-tile ws">
+      <div class="habit-stat-tile-label">Wastage</div>
+      <div class="habit-stat-tile-num">${s.wasteDays} <span>caught</span></div>
+      <div class="habit-stat-tile-sub">${s.wasteNone} nothing notable</div>
+    </div>`;
+
+  const ladder = habitState.badges.slice().sort((a,b) => a.level - b.level).map(b => {
+    const level = Number(b.level);
+    const isEarned = s.earned.some(e => e.level === level);
+    const isNext = s.nextLevel === level;
+    const cfg = habitState.config;
+    const ringFrac = isNext ? Math.min(1, Math.max(0, (level * cfg.daysPerBadge - s.daysToGo) / (level * cfg.daysPerBadge))) : 0;
+    const state = isEarned ? 'earned' : (isNext ? 'next' : 'locked');
+    const sub = isNext ? `<div class="habit-medal-togo">${s.daysToGo} day${s.daysToGo === 1 ? '' : 's'} to go</div>`
+      : (!isEarned ? `<div class="habit-medal-togo">${level * cfg.daysPerBadge} days</div>` : '');
+    return `<div class="habit-medal ${state}">${habitMedalSvg(level, state, ringFrac)}<div class="habit-medal-name">${habitEsc(b.name)}</div>${sub}</div>`;
+  }).join('');
+  document.getElementById('habitLadderCard').innerHTML = ladder || '<p class="state-msg">No badges set up yet.</p>';
+
+  document.getElementById('tabHabitDot').classList.toggle('show', !habitRowFor(habitState.today));
+  return s;
+}
+
+function habitShowCelebration(badge){
+  const el = document.getElementById('habitCelebrate');
+  const tier = habitTier(Number(badge.level));
+  el.innerHTML = `
+    <svg class="habit-confetti" viewBox="0 0 300 56" aria-hidden="true">
+      <rect x="20" y="8" width="7" height="12" fill="#EF9F27" transform="rotate(20 23 14)"/>
+      <rect x="60" y="26" width="6" height="10" fill="#5DCAA5" transform="rotate(-30 63 31)"/>
+      <rect x="200" y="10" width="7" height="12" fill="#ED93B1" transform="rotate(35 203 16)"/>
+      <rect x="235" y="34" width="6" height="10" fill="#FAC775"/>
+      <circle cx="110" cy="10" r="3.5" fill="#85B7EB"/>
+      <circle cx="160" cy="36" r="3.5" fill="#EF9F27"/>
+      <rect x="140" y="4" width="6" height="10" fill="#5DCAA5" transform="rotate(50 143 9)"/>
+    </svg>
+    ${habitMedalSvg(Number(badge.level), 'earned', 0)}
+    <p class="habit-celebrate-eyebrow">Level up</p>
+    <p class="habit-celebrate-name">${habitEsc(badge.name)}</p>
+    <p class="habit-celebrate-tier">${tier.tier} tier · level ${badge.level}</p>
+    <button type="button" class="habit-celebrate-dismiss" id="habitCelebrateDismiss">Nice, keep going</button>`;
+  el.classList.remove('hidden');
+  document.getElementById('habitCelebrateDismiss').addEventListener('click', () => el.classList.add('hidden'));
+}
+
+function habitChipsHtml(rowKey, cls){
+  const picked = habitState.draft[rowKey];
+  const chips = habitState.categories
+    .filter(c => c.active)
+    .map(c => `<button type="button" class="habit-chip ${cls} ${picked.includes(c.categoryId) ? 'on' : ''}" data-row="${rowKey}" data-id="${habitEsc(c.categoryId)}">${habitEsc(c.name)}</button>`).join('');
+  const nn = `<button type="button" class="habit-chip nn ${cls} ${picked.includes(HABIT_NONE) ? 'on' : ''}" data-row="${rowKey}" data-id="${HABIT_NONE}">Nothing notable</button>`;
+  return chips + nn;
+}
+
+function habitRenderInput(){
+  const card = document.getElementById('habitInputCard');
+  const sel = habitState.selectedDate;
+  const isClosed = !!habitRowFor(sel);
+  const dayPills = habitOpenDates().map((d, i) => {
+    const label = i === 0 ? `Today · ${habitDayLabel(d)}` : (i === 1 ? `Yesterday · ${habitDayLabel(d)}` : habitDayLabel(d));
+    const done = habitRowFor(d) ? '<i class="ti ti-check done"></i>' : '';
+    return `<button type="button" class="habit-day ${d === sel ? 'active' : ''}" data-date="${d}">${label}${done}</button>`;
+  }).join('');
+  card.style.display = 'block';
+  card.innerHTML = `
+    <div class="habit-days">${dayPills}</div>
+    <p class="habit-row-label sv">Savings</p>
+    <div class="habit-chips">${habitChipsHtml('savings', 'sv')}</div>
+    <p class="habit-row-label ws">Wastage</p>
+    <div class="habit-chips">${habitChipsHtml('wastage', 'ws')}</div>
+    <input type="text" class="habit-remark" id="habitRemark" maxlength="200" placeholder="Remark for the day (optional)" value="${habitEsc(habitState.draft.remark)}">
+    <button class="btn habit-close" id="habitCloseBtn" ${habitState.saving ? 'disabled' : ''}>${isClosed ? 'Update day' : 'Close the day'}</button>
+    <p class="form-msg" id="habitMsg"></p>`;
+
+  card.querySelectorAll('.habit-day').forEach(b => b.addEventListener('click', () => {
+    habitLoadDraft(b.dataset.date);
+    habitRenderInput();
+  }));
+  card.querySelectorAll('.habit-chip').forEach(b => b.addEventListener('click', () => habitToggleChip(b)));
+  document.getElementById('habitRemark').addEventListener('input', e => { habitState.draft.remark = e.target.value; });
+  document.getElementById('habitCloseBtn').addEventListener('click', habitCloseDay);
+}
+
+function habitToggleChip(btn){
+  const rowKey = btn.dataset.row, id = btn.dataset.id;
+  let picked = habitState.draft[rowKey];
+  if (id === HABIT_NONE) picked = picked.includes(HABIT_NONE) ? [] : [HABIT_NONE];
+  else {
+    picked = picked.filter(x => x !== HABIT_NONE);
+    picked = picked.includes(id) ? picked.filter(x => x !== id) : picked.concat(id);
+  }
+  habitState.draft[rowKey] = picked;
+  const container = btn.parentElement;
+  container.querySelectorAll('.habit-chip').forEach(c => c.classList.toggle('on', picked.includes(c.dataset.id)));
+  btn.classList.add('pop');
+  setTimeout(() => btn.classList.remove('pop'), 140);
+  document.getElementById('habitMsg').textContent = '';
+}
+
+async function habitCloseDay(){
+  const msg = document.getElementById('habitMsg');
+  const d = habitState.draft;
+  const missing = [];
+  if (!d.savings.length) missing.push('Savings');
+  if (!d.wastage.length) missing.push('Wastage');
+  if (missing.length){
+    msg.textContent = `Pick at least one chip in ${missing.join(' and ')} (or Nothing notable).`;
+    msg.className = 'form-msg error';
+    return;
+  }
+  if (d.remark.length > 200){ msg.textContent = 'Keep the remark to 200 characters.'; msg.className = 'form-msg error'; return; }
+
+  const order = id => { const c = habitState.categories.find(x => x.categoryId === id); return c ? c.sortOrder : 999; };
+  const row = {
+    date: habitState.selectedDate,
+    savings: d.savings.slice().sort((a,b) => order(a) - order(b)).join(','),
+    wastage: d.wastage.slice().sort((a,b) => order(a) - order(b)).join(','),
+    remark: d.remark.trim(),
+  };
+
+  // Optimistic update: show the result immediately, sync in the background
+  const prevLog = habitState.log;
+  const before = habitDerive(prevLog, habitState.config, habitState.badges, habitState.today);
+  habitState.log = prevLog.filter(r => r.date !== row.date).concat(row);
+  const after = habitDerive(habitState.log, habitState.config, habitState.badges, habitState.today);
+  const newBadge = after.earned.find(e => !before.earned.some(b => b.level === e.level));
+  const newBadgeInfo = newBadge ? habitState.badges.find(b => Number(b.level) === newBadge.level) : null;
+  habitState.saving = true;
+  habitRenderStatus();
+  habitRenderInput();
+  const msg2 = document.getElementById('habitMsg');
+  msg2.textContent = 'Saving…'; msg2.className = 'form-msg';
+
+  let res;
+  try { res = await apiPost({ action: 'habitCloseDay', ...row }); } catch (err){ res = { ok: false }; }
+  habitState.saving = false;
+  if (!res || res.success !== true){
+    habitState.log = prevLog;
+    document.getElementById('habitCelebrate').classList.add('hidden');
+    habitRenderStatus();
+    habitRenderInput();
+    const m = document.getElementById('habitMsg');
+    m.textContent = (res && res.error) ? res.error : "Couldn't save. Try again.";
+    m.className = 'form-msg error';
+    return;
+  }
+  habitRenderInput();
+  const m = document.getElementById('habitMsg');
+  m.textContent = `Day closed. Streak ${after.streak} day${after.streak === 1 ? '' : 's'}.`;
+  m.className = 'form-msg ok';
+  if (newBadgeInfo) habitShowCelebration(newBadgeInfo);
+}
+
+async function habitLoad(){
+  let data;
+  try { data = await apiGet('habitData'); } catch (err){ data = null; }
+  if (!data || data.error){
+    document.getElementById('habitHeroCard').innerHTML = `<p class="state-msg">${habitEsc((data && data.error) || "Couldn't load the daily habit data.")}</p>`;
+    document.getElementById('habitStatsCard').innerHTML = '';
+    document.getElementById('habitLadderCard').innerHTML = '';
+    document.getElementById('habitInputCard').style.display = 'none';
+    return;
+  }
+  habitState.config = Object.assign({}, HABIT_DEFAULTS, data.config || {});
+  habitState.categories = (data.categories || []).slice().sort((a,b) => a.sortOrder - b.sortOrder);
+  habitState.badges = data.badges || [];
+  habitState.log = data.log || [];
+  habitState.today = habitTodayIso();
+  const keep = habitState.selectedDate && habitOpenDates().includes(habitState.selectedDate);
+  habitLoadDraft(keep ? habitState.selectedDate : habitState.today);
+  habitState.loaded = true;
+  habitRenderStatus();
+  habitRenderInput();
+}
+
+document.getElementById('refreshBtn').addEventListener('click', habitLoad);
+habitLoad();
+/* ===== HABIT-LOG script (end) ===== */
+
+/* ===================================================================
+ * TAB-NAV script (start) — remove with the TAB-NAV styles/markup to
+ * fold the Ledger and Daily habit panels back into one page.
+ * SPEC TAG
+ * Status: New. Splits the page into two tab panels; the existing Refresh
+ *   button and sync time stay shared above both tabs and reload whichever
+ *   tab is open (habitLoad and loadAndRenderExpenses both already run on
+ *   Refresh — see their own listeners).
+ * Default tab: Daily habit, every load (Krishna's call — this is the daily
+ *   action, so it opens first regardless of whether today is closed).
+ * Dependency: the tab-dot indicator is set by habitRenderStatus() (HABIT-LOG
+ *   block) whenever today has no row yet.
+ * =================================================================== */
+function habitSwitchTab(tab){
+  document.getElementById('tabPanelHabit').classList.toggle('hidden', tab !== 'habit');
+  document.getElementById('tabPanelLedger').classList.toggle('hidden', tab !== 'ledger');
+  document.getElementById('tabBtnHabit').classList.toggle('active', tab === 'habit');
+  document.getElementById('tabBtnLedger').classList.toggle('active', tab === 'ledger');
+}
+document.getElementById('tabBtnHabit').addEventListener('click', () => habitSwitchTab('habit'));
+document.getElementById('tabBtnLedger').addEventListener('click', () => habitSwitchTab('ledger'));
+habitSwitchTab('habit');
+/* ===== TAB-NAV script (end) ===== */
 </script>
 </body>
 </html>
