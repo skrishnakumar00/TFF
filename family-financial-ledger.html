@@ -182,6 +182,35 @@
   .habit-celebrate-dismiss{margin-top:16px; background:#EF9F27; color:#412402; border:none; border-radius:12px; padding:10px 16px; font-family:'IBM Plex Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; width:100%;}
   .habit-confetti{position:absolute; top:0; left:0; right:0; height:56px; opacity:0.9;}
   /* ===== HABIT-LOG styles (end) ===== */
+
+  /* ===== SIDE-ENCOURAGE styles (start) — remove with the SIDE-ENCOURAGE markup and script
+     blocks. Ambient encouragement card for the daily habit log, fixed beside the centered
+     .wrap on wide screens only (the .wrap column leaves that space blank above ~1180px);
+     hidden entirely on narrower viewports, so mobile/tablet layout is untouched. Visibility
+     while the Ledger tab is open is toggled by the one added line in TAB-NAV's
+     habitSwitchTab — see that block. */
+  .side-encourage{display:none;}
+  @media (min-width:1180px){
+    .side-encourage{
+      display:flex; flex-direction:column; align-items:center; gap:2px; text-align:center;
+      position:fixed; top:150px; right:36px; width:190px;
+      background:var(--paper-raised); border:0.5px solid var(--rule);
+      border-radius:14px; padding:14px 15px 15px; box-shadow:0 6px 18px rgba(0,0,0,0.05);
+    }
+    .side-encourage.hidden{display:none;}
+  }
+  .side-encourage-text{font-family:'IBM Plex Sans',sans-serif; font-size:12.5px; line-height:1.45; color:var(--ink-soft); transition:opacity .4s ease; margin-top:6px;}
+  .side-encourage-text.fade{opacity:0;}
+  /* ===== SIDE-ENCOURAGE styles (end) ===== */
+
+  /* ===== PLANT-GROWTH styles (start) — remove with the PLANT-GROWTH script block and the
+     plant/streak-label markup lines inside #sideEncourage (the encouragement text line stays,
+     it belongs to SIDE-ENCOURAGE). */
+  .side-encourage-plant{width:52px; height:52px; transition:opacity .4s ease;}
+  .side-encourage-plant.fade{opacity:0;}
+  .side-encourage-plant svg{display:block; margin:0 auto;}
+  .side-encourage-streak{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.04em; color:var(--ink); font-weight:500; margin:2px 0 0;}
+  /* ===== PLANT-GROWTH styles (end) ===== */
 </style>
 </head>
 <body>
@@ -225,6 +254,16 @@
       </div>
       <!-- ===== HABIT-LOG markup (end) ===== -->
     </div>
+
+    <!-- ===== SIDE-ENCOURAGE markup (start) — remove with the SIDE-ENCOURAGE styles and script
+         blocks. Sits outside both tab panels since it's position:fixed to the viewport, not
+         part of the .wrap flow. -->
+    <div class="side-encourage hidden" id="sideEncourage">
+      <div class="side-encourage-plant" id="sideEncouragePlant"></div>
+      <p class="side-encourage-streak" id="sideEncourageStreak"></p>
+      <div class="side-encourage-text" id="sideEncourageText"></div>
+    </div>
+    <!-- ===== SIDE-ENCOURAGE markup (end) ===== -->
 
     <div class="tab-panel hidden" id="tabPanelLedger">
 
@@ -1104,6 +1143,7 @@ function habitRenderStatus(){
   document.getElementById('habitLadderCard').innerHTML = ladder || '<p class="state-msg">No badges set up yet.</p>';
 
   document.getElementById('tabHabitDot').classList.toggle('show', !habitRowFor(habitState.today));
+  if (typeof sideEncourageRender === 'function') sideEncourageRender(s); // SIDE-ENCOURAGE / PLANT-GROWTH hook
   return s;
 }
 
@@ -1196,6 +1236,7 @@ async function habitCloseDay(){
   }
   if (d.remark.length > 200){ msg.textContent = 'Keep the remark to 200 characters.'; msg.className = 'form-msg error'; return; }
 
+  const wasAlreadyLogged = !!habitRowFor(habitState.selectedDate); // SAVE-CHEER: fresh log vs. edit
   const order = id => { const c = habitState.categories.find(x => x.categoryId === id); return c ? c.sortOrder : 999; };
   const row = {
     date: habitState.selectedDate,
@@ -1232,7 +1273,9 @@ async function habitCloseDay(){
   }
   habitRenderInput();
   const m = document.getElementById('habitMsg');
-  m.textContent = `Day closed. Streak ${after.streak} day${after.streak === 1 ? '' : 's'}.`;
+  m.textContent = (typeof saveCheerLine === 'function')
+    ? saveCheerLine(after, wasAlreadyLogged)
+    : `Day closed. Streak ${after.streak} day${after.streak === 1 ? '' : 's'}.`;
   m.className = 'form-msg ok';
   if (newBadgeInfo) habitShowCelebration(newBadgeInfo);
 }
@@ -1264,6 +1307,222 @@ habitLoad();
 /* ===== HABIT-LOG script (end) ===== */
 
 /* ===================================================================
+ * SIDE-ENCOURAGE script (start) — remove with the SIDE-ENCOURAGE styles
+ * and markup blocks.
+ * SPEC TAG
+ * Feature: Ambient encouragement card, fixed beside the ledger column on
+ *   wide screens (see the styles block for the breakpoint), showing one
+ *   rotating line about the daily habit log. Independent of the habit-log
+ *   save flow and data model — reads habitDerive()'s summary only, writes
+ *   nothing.
+ * Status: New.
+ *   Hooks: one added line in TAB-NAV's habitSwitchTab (toggles this card's
+ *   visibility with the tab); called once from HABIT-LOG's habitLoad via
+ *   one added line there.
+ *
+ * Behaviour
+ * - Line pool is grouped by state (cold / active / rebuilding / near a
+ *   badge) so the line matches where the person actually is, not a flat
+ *   random pick across all states.                                CONFIRMED
+ * - Picked at random within that state's pool, never repeating any of the
+ *   last 3 lines shown (across states) — a small pool shown unpredictably
+ *   reads better than a large pool shown in order.                CONFIRMED
+ * - Rotates on: habit data finishing load, switching to the Daily habit
+ *   tab, and every 50s while that tab is open (cleared when the Ledger tab
+ *   is open or the browser tab is hidden, so it never runs unseen).
+ *                                                                  CONFIRMED
+ * - Text swap uses a quick fade rather than a hard cut.            CONFIRMED
+ *
+ * Dependencies: HABIT-LOG's habitState, habitDerive(), habitRenderStatus()
+ *   (one added line, passing it the summary it already computed); TAB-NAV's
+ *   habitSwitchTab (one added line). Draws the plant graphic and streak
+ *   label via PLANT-GROWTH's habitPlantSvg() when that block is present
+ *   (guarded — this card still works, just without the plant, if it's
+ *   removed).
+ * =================================================================== */
+const SIDE_ENCOURAGE_LINES = {
+  cold: [
+    "Even one log today counts.",
+    "Awareness starts with a single entry.",
+    "No streak yet — today's a fine day to start one.",
+    "You don't need a perfect week, just today.",
+  ],
+  active: [
+    "Noticing waste is how you stop it.",
+    "Small logs, big clarity by month-end.",
+    "Every entry makes the next one easier to spot.",
+    "Still going — that's the habit forming.",
+    "A 10-second log today saves guessing later.",
+  ],
+  rebuilding: [
+    "Back today? That's what matters.",
+    "One log at a time — no need to chase yesterday's streak.",
+    "Today's entry is the only one that counts right now.",
+  ],
+  milestone: [
+    "So close to the next level — one more day.",
+    "A couple of days from your next badge.",
+  ],
+};
+const sideEncourageHistory = [];
+
+function sideEncourageBucket(s){
+  if (!s.streak && !s.best) return 'cold';
+  if (!s.streak && s.best) return 'rebuilding';
+  if (s.daysToGo !== null && s.daysToGo <= 2) return 'milestone';
+  return 'active';
+}
+function sideEncourageDerive(){
+  return habitDerive(habitState.log, habitState.config, habitState.badges, habitState.today);
+}
+function sideEncouragePick(s){
+  const pool = SIDE_ENCOURAGE_LINES[sideEncourageBucket(s)];
+  const options = pool.filter(l => !sideEncourageHistory.includes(l));
+  const line = (options.length ? options : pool)[Math.floor(Math.random() * (options.length ? options.length : pool.length))];
+  sideEncourageHistory.push(line);
+  if (sideEncourageHistory.length > 3) sideEncourageHistory.shift();
+  return line;
+}
+function sideEncourageRender(s){
+  const text = document.getElementById('sideEncourageText');
+  if (!text) return;
+  const summary = s || sideEncourageDerive();
+  if (typeof sideEncourageRenderPlant === 'function') sideEncourageRenderPlant(summary); // PLANT-GROWTH hook
+  text.classList.add('fade');
+  setTimeout(() => {
+    text.textContent = sideEncouragePick(summary);
+    text.classList.remove('fade');
+  }, 220);
+}
+let sideEncourageTimer = null;
+function sideEncourageSetActive(active){
+  const card = document.getElementById('sideEncourage');
+  if (card) card.classList.toggle('hidden', !active);
+  if (sideEncourageTimer){ clearInterval(sideEncourageTimer); sideEncourageTimer = null; }
+  if (active){
+    sideEncourageRender();
+    sideEncourageTimer = setInterval(() => { if (!document.hidden) sideEncourageRender(); }, 50000);
+  }
+}
+/* ===== SIDE-ENCOURAGE script (end) ===== */
+
+/* ===================================================================
+ * PLANT-GROWTH script (start) — remove with the PLANT-GROWTH styles and
+ * the plant/streak-label markup lines inside #sideEncourage.
+ * SPEC TAG
+ * Feature: Small SVG plant in the SIDE-ENCOURAGE card that grows in
+ *   stages with the current streak — the "attractive" visual encoding of
+ *   the same streak number the habit-hero flame already shows (kept
+ *   there unchanged; this is a second, more emotionally-legible view of
+ *   the same figure, not a replacement).
+ * Status: New. Reads the streak number only; no new data, no change to
+ *   HABIT-LOG's calculations.
+ *
+ * Behaviour
+ * - 6 stages by raw streak length: bare soil (0), sprout (1-2), seedling
+ *   (3-6), young plant (7-13), bushy (14-29), bloom (30+). Fixed
+ *   thresholds, independent of the Config tab's daysPerBadge — the plant
+ *   tracks the streak itself, not progress toward a badge.
+ *                                                                  CONFIRMED
+ * - Redraws only when the streak number actually changes (SIDE-ENCOURAGE
+ *   calls this on every render, incl. the 50s rotation, but it no-ops
+ *   unless the streak differs from what's already drawn) — the plant
+ *   should read as "growing", not flicker on an unrelated text rotation.
+ *                                                                  CONFIRMED
+ * - Fades out/in on redraw, same timing as the encouragement text.
+ *                                                                  CONFIRMED
+ *
+ * Dependencies: called from SIDE-ENCOURAGE's sideEncourageRender (one
+ *   guarded line there) with the habitDerive() summary it already has.
+ * =================================================================== */
+let sideEncourageLastStreak = null;
+function habitPlantSvg(streak){
+  const stage = streak <= 0 ? 0 : streak < 3 ? 1 : streak < 7 ? 2 : streak < 14 ? 3 : streak < 30 ? 4 : 5;
+  const stemTop = 57 - [0, 12, 20, 28, 34, 39][stage];
+  const leafRows = { 1: [8], 2: [16, 7], 3: [20, 12, 5], 4: [22, 15, 9, 4] }[stage] || [];
+  const soil = `<ellipse cx="30" cy="57" rx="15" ry="4" fill="var(--rule)"/>`;
+  const stem = stage > 0 ? `<line x1="30" y1="56" x2="30" y2="${stemTop}" stroke="var(--teal)" stroke-width="3" stroke-linecap="round"/>` : '';
+  const leaves = leafRows.map((offset, i) => {
+    const side = i % 2 === 0 ? 1 : -1;
+    const y = stemTop + offset;
+    const x = 30 + side * 8;
+    return `<ellipse cx="${x}" cy="${y}" rx="9" ry="5" fill="var(--teal)" transform="rotate(${side * 32} ${x} ${y})"/>`;
+  }).join('');
+  const bloom = stage === 5 ? `
+    <circle cx="24" cy="${stemTop - 2}" r="4" fill="#ED93B1"/>
+    <circle cx="36" cy="${stemTop - 2}" r="4" fill="#ED93B1"/>
+    <circle cx="30" cy="${stemTop - 7}" r="4" fill="#ED93B1"/>
+    <circle cx="30" cy="${stemTop + 3}" r="4" fill="#ED93B1"/>
+    <circle cx="30" cy="${stemTop - 2}" r="3.5" fill="var(--gold)"/>` : '';
+  return `<svg width="52" height="52" viewBox="0 0 60 60" aria-hidden="true">${soil}${stem}${leaves}${bloom}</svg>`;
+}
+function sideEncourageRenderPlant(s){
+  const wrap = document.getElementById('sideEncouragePlant');
+  const label = document.getElementById('sideEncourageStreak');
+  if (!wrap || !label || sideEncourageLastStreak === s.streak) return;
+  sideEncourageLastStreak = s.streak;
+  wrap.classList.add('fade');
+  setTimeout(() => {
+    wrap.innerHTML = habitPlantSvg(s.streak);
+    label.textContent = s.streak ? `${s.streak}-day streak` : 'No streak yet';
+    wrap.classList.remove('fade');
+  }, 220);
+}
+/* ===== PLANT-GROWTH script (end) ===== */
+
+/* ===================================================================
+ * SAVE-CHEER script (start) — remove with the one line in habitCloseDay
+ * that calls saveCheerLine() (falls back to the original fixed message
+ * automatically — see that line).
+ * SPEC TAG
+ * Feature: Warm, varied confirmation line after closing a day, in place
+ *   of the earlier fixed "Day closed. Streak N days." message.
+ * Status: New. No change to validations, the save flow, or the data
+ *   model — this only picks the text of habitCloseDay's existing success
+ *   message.
+ *
+ * Behaviour
+ * - A genuinely new day closed (no row existed for that date before this
+ *   save) picks at random from a warm, non-repetitive line pool, never
+ *   repeating any of the last 3 shown — reserving the varied "reward" copy
+ *   for the moment the habit actually completes, not every edit.
+ *                                                                  CONFIRMED
+ * - Editing an already-closed day gets a calm fixed "Updated" line
+ *   instead — no random pool, so revisiting a day never reads as bigger
+ *   news than closing a new one.                                  CONFIRMED
+ * - A new badge earned this save already gets its own celebration screen
+ *   (habitShowCelebration, existing); this line is unchanged either way,
+ *   it does not also try to announce the badge.                   CONFIRMED
+ *
+ * Dependencies: HABIT-LOG's habitCloseDay (one added line reads
+ *   wasAlreadyLogged and calls saveCheerLine instead of building the
+ *   message inline).
+ * =================================================================== */
+const SAVE_CHEER_LINES = [
+  "Logged — that's {n} day{s} of honest tracking.",
+  "Noted. Tomorrow's a clean slate.",
+  "Nice, {n} day{s} in. Awareness is the first fix.",
+  "Done for today — small win logged.",
+  "Saved. That's the habit doing its job.",
+  "Today's in the books. {n} day{s} strong.",
+  "Logged. One more data point toward the full picture.",
+  "That's today sorted — {n} day{s} running.",
+];
+const saveCheerHistory = [];
+function saveCheerLine(after, wasAlreadyLogged){
+  if (wasAlreadyLogged){
+    return `Updated — streak still ${after.streak} day${after.streak === 1 ? '' : 's'}.`;
+  }
+  const options = SAVE_CHEER_LINES.filter(l => !saveCheerHistory.includes(l));
+  const pool = options.length ? options : SAVE_CHEER_LINES;
+  const line = pool[Math.floor(Math.random() * pool.length)];
+  saveCheerHistory.push(line);
+  if (saveCheerHistory.length > 3) saveCheerHistory.shift();
+  return line.replace('{n}', after.streak).replace('{s}', after.streak === 1 ? '' : 's');
+}
+/* ===== SAVE-CHEER script (end) ===== */
+
+/* ===================================================================
  * TAB-NAV script (start) — remove with the TAB-NAV styles/markup to
  * fold the Ledger and Daily habit panels back into one page.
  * SPEC TAG
@@ -1281,6 +1540,7 @@ function habitSwitchTab(tab){
   document.getElementById('tabPanelLedger').classList.toggle('hidden', tab !== 'ledger');
   document.getElementById('tabBtnHabit').classList.toggle('active', tab === 'habit');
   document.getElementById('tabBtnLedger').classList.toggle('active', tab === 'ledger');
+  if (typeof sideEncourageSetActive === 'function') sideEncourageSetActive(tab === 'habit'); // SIDE-ENCOURAGE hook
 }
 document.getElementById('tabBtnHabit').addEventListener('click', () => habitSwitchTab('habit'));
 document.getElementById('tabBtnLedger').addEventListener('click', () => habitSwitchTab('ledger'));
