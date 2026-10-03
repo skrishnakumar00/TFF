@@ -183,6 +183,11 @@
   .habit-confetti{position:absolute; top:0; left:0; right:0; height:56px; opacity:0.9;}
   /* ===== HABIT-LOG styles (end) ===== */
 
+  /* ===== WASTAGE-DEFINE styles (start) — remove with the one line in habitRenderInput
+     (HABIT-LOG block) that outputs <p class="habit-wastage-note">. */
+  .habit-wastage-note{font-size:11px; line-height:1.4; color:var(--ink-soft); font-style:italic; margin:-2px 0 8px;}
+  /* ===== WASTAGE-DEFINE styles (end) ===== */
+
   /* ===== SIDE-ENCOURAGE styles (start) — remove with the SIDE-ENCOURAGE markup and script
      blocks. Ambient encouragement card for the daily habit log, fixed beside the centered
      .wrap on wide screens only (the .wrap column leaves that space blank above ~1180px);
@@ -1188,11 +1193,20 @@ function habitRenderInput(){
     return `<button type="button" class="habit-day ${d === sel ? 'active' : ''}" data-date="${d}">${label}${done}</button>`;
   }).join('');
   card.style.display = 'block';
+  /* ===== WASTAGE-DEFINE (start) — SPEC TAG
+   * Feature: Fixed, always-on caption under the Wastage label, defining what
+   *   counts (Krishna's call, 2026-10-03): disposed stale/expired/excess, or
+   *   bought but rarely/never used. Status: New — one added <p> line below,
+   *   plus its style in the WASTAGE-DEFINE styles block. No validations or
+   *   calculations; display text only. To remove: delete the <p> line and
+   *   that styles block.
+   * ===== WASTAGE-DEFINE (end) ===== */
   card.innerHTML = `
     <div class="habit-days">${dayPills}</div>
     <p class="habit-row-label sv">Savings</p>
     <div class="habit-chips">${habitChipsHtml('savings', 'sv')}</div>
     <p class="habit-row-label ws">Wastage</p>
+    <p class="habit-wastage-note">Disposed stale, expired or excess — or bought but rarely/never used.</p>
     <div class="habit-chips">${habitChipsHtml('wastage', 'ws')}</div>
     <input type="text" class="habit-remark" id="habitRemark" maxlength="200" placeholder="Remark for the day (optional)" value="${habitEsc(habitState.draft.remark)}">
     <button class="btn habit-close" id="habitCloseBtn" ${habitState.saving ? 'disabled' : ''}>${isClosed ? 'Update day' : 'Close the day'}</button>
